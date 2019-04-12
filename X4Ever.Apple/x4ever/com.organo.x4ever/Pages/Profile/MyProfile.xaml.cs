@@ -37,7 +37,7 @@ namespace com.organo.x4ever.Pages.Profile
             }
             catch (Exception ex)
             {
-                new ExceptionHandler(TAG, ex);
+                var exceptionHandler = new ExceptionHandler(TAG, ex);
             }
         }
 
