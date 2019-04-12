@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
+	<string>ca-app-pub-3940256099942544/2934735716</string>
+	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
+	<string>ca-app-pub-3940256099942544/4411468910</string>
+	<key>CLIENT_ID</key>
+	<string>738422998101-h1k1sps50u2e7edc5e1fo5l4g4611gb0.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.738422998101-h1k1sps50u2e7edc5e1fo5l4g4611gb0</string>
+	<key>API_KEY</key>
+	<string>AIzaSyC0EE8bFFYLfl7p8TjoJ9zs87qf-G4sKns</string>
+	<key>GCM_SENDER_ID</key>
+	<string>738422998101</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.organo.x4ever.ios</string>
+	<key>PROJECT_ID</key>
+	<string>organox4everasia</string>
+	<key>STORAGE_BUCKET</key>
+	<string>organox4everasia.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<true></true>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<false></false>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:738422998101:ios:6787e5fd9adb3218</string>
+	<key>DATABASE_URL</key>
+	<string>https://organox4everasia.firebaseio.com</string>
+</dict>
+</plist>

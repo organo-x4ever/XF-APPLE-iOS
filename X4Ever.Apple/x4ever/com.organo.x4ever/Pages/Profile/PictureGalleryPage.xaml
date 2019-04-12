@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<page:PictureGalleryPageXaml
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="com.organo.x4ever.Pages.Profile.PictureGalleryPage"
+    xmlns:page="clr-namespace:com.organo.x4ever.Pages.Profile"
+    xmlns:statics="clr-namespace:com.organo.x4ever.Statics"
+    xmlns:app="clr-namespace:com.organo.x4ever"
+    xmlns:translate="clr-namespace:com.organo.x4ever.Localization"
+    xmlns:extensions="clr-namespace:com.organo.x4ever.Extensions;assembly=com.organo.x4ever"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
+    xmlns:controls="clr-namespace:com.organo.x4ever.Controls;assembly=com.organo.x4ever">
+  <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+    <controls:TopBarPopupView/>
+    <StackLayout Orientation="Vertical" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" Margin="0,20,0,0">
+      <StackLayout Margin="15,5,15,10" HorizontalOptions="Center">
+        <Label Text="{Binding DisplayGalleryLink}" Style="{DynamicResource labelStyleLargeMedium}" HorizontalOptions="Center" />
+        <BoxView BackgroundColor="{x:Static statics:Palette._White}" HeightRequest="1" Margin="0,-6,0,0" />
+      </StackLayout>
+      <ListView x:Name="ListViewGallery" SeparatorVisibility="None" HasUnevenRows="True" ItemsSource="{Binding UserTrackersDescending}" Margin="0,30,0,0" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" BackgroundColor="{x:Static statics:Palette._Transparent}">
+        <ListView.ItemTemplate>
+          <DataTemplate>
+            <ViewCell>
+              <Grid RowSpacing="2" ColumnSpacing="1" HorizontalOptions="FillAndExpand" Margin="15,15,15,25">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="2" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="10" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackLayout Grid.Row="0" Margin="10,0,10,0" Orientation="Horizontal" HorizontalOptions="Start">
+                  <Label Text="{Binding ModifyDateDisplay}" Style="{DynamicResource labelStyleMedium}" />
+                </StackLayout>
+                <StackLayout Grid.Row="2" Margin="10,0,10,0" Orientation="Horizontal">
+                  <Image Source="{Binding FrontImageSource}" HorizontalOptions="Start" VerticalOptions="Center" HeightRequest="{Binding PictureHeight}" WidthRequest="{Binding PictureWidth}" />
+                  <Image Source="{Binding SideImageSource}" HorizontalOptions="Start" VerticalOptions="Center" HeightRequest="{Binding PictureHeight}" WidthRequest="{Binding PictureWidth}" />
+                </StackLayout>
+              </Grid>
+            </ViewCell>
+          </DataTemplate>
+        </ListView.ItemTemplate>
+      </ListView>
+    </StackLayout>
+    <controls:FooterView/>
+  </StackLayout>
+</page:PictureGalleryPageXaml>

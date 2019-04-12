@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<profile:TrackerLogPageXaml 
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:profile="clr-namespace:com.organo.x4ever.Pages.Profile;assembly=com.organo.x4ever"
+    xmlns:controls="clr-namespace:com.organo.x4ever.Controls;assembly=com.organo.x4ever"
+    xmlns:statics="clr-namespace:com.organo.x4ever.Statics;assembly=com.organo.x4ever"
+    x:Class="com.organo.x4ever.Pages.Profile.TrackerLogPage">
+    <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+      <controls:TopBarPopupView></controls:TopBarPopupView>
+        <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" BackgroundColor="{x:Static statics:Palette._Transparent}">
+            <ScrollView HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Padding="0" Margin="0,-6,0,0">
+                <controls:GridTracker x:Name="gridTracker" BackgroundColor="{x:Static statics:Palette._Transparent}" Margin="15,15,15,5" />
+            </ScrollView>
+        </StackLayout>
+      <controls:FooterView />
+  </StackLayout>
+</profile:TrackerLogPageXaml>

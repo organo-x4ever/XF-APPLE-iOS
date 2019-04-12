@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<page:TestimonialDetailPageXaml
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="com.organo.x4ever.Pages.Testimonial.TestimonialDetailPage"
+    xmlns:statics="clr-namespace:com.organo.x4ever.Statics"
+    xmlns:page="clr-namespace:com.organo.x4ever.Pages.Testimonial"
+    xmlns:forms="clr-namespace:Plugin.MediaManager.Forms;assembly=Plugin.MediaManager.Forms"
+    xmlns:controls="clr-namespace:com.organo.x4ever.Controls;assembly=com.organo.x4ever">
+  <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+    <controls:TopBarPopupView/>
+    <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand" Margin="0" HeightRequest="300">
+      <forms:VideoView Source="{Binding Source}" AspectMode="AspectFill" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
+    </StackLayout>
+    <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand" Margin="0,10,0,0">
+      <ScrollView Orientation="Vertical" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+        <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
+          <Label Text="{Binding Testimonial.PersonName}" Style="{DynamicResource labelStyleInfoHighlightSmall}" HorizontalOptions="Center" TextColor="{x:Static statics:Palette._White}" />
+          <Label HorizontalOptions="FillAndExpand" LineBreakMode="WordWrap" Style="{DynamicResource labelStyleLinkHighlight}" Text="{Binding Testimonial.LongDescription}" />
+        </StackLayout>
+      </ScrollView>
+    </StackLayout>
+    <controls:FooterView/>
+  </StackLayout>
+</page:TestimonialDetailPageXaml>

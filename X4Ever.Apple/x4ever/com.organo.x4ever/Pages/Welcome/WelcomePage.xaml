@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<welcome:WelcomePageXaml
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:welcome="clr-namespace:com.organo.x4ever.Pages.Welcome;assembly=com.organo.x4ever"
+    xmlns:forms="clr-namespace:Plugin.MediaManager.Forms;assembly=Plugin.MediaManager.Forms"
+    xmlns:statics="clr-namespace:com.organo.x4ever.Statics;assembly=com.organo.x4ever"
+    x:Class="com.organo.x4ever.Pages.Welcome.WelcomePage">
+    <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Margin="0,15,0,0">
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
+        <Label IsVisible="{Binding IsBusy}" Text="{Binding BusyMessage}" Style="{DynamicResource labelBusyMessage}" />
+        <Label IsVisible="{Binding IsError}" Text="{Binding ErrorMessage}" Style="{DynamicResource labelErrorMessage}" />
+        <Label IsVisible="{Binding IsMessage}" Text="{Binding MessageText}" Style="{DynamicResource labelSuccessMessage}" />
+    </StackLayout>
+  <Grid HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" IsVisible="{Binding IsEditable}">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <forms:VideoView Grid.Row="0" Source="{Binding VideoSource}" AspectMode="AspectFill" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" />
+    <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" BackgroundColor="{x:Static statics:Palette._VideoTransparent}">
+
+      <StackLayout HorizontalOptions="End" VerticalOptions="EndAndExpand" Margin="0,0,10,35" Opacity="{Binding Opacity}" IsVisible="{Binding IsSkipVisible}" BackgroundColor="{x:Static statics:Palette._Transparent}">
+        <Label Text="{Binding SkipText}" Style="{DynamicResource labelStyleSkip}">
+          <Label.GestureRecognizers>
+            <TapGestureRecognizer Command="{Binding SkipCommand}" NumberOfTapsRequired="1" />
+          </Label.GestureRecognizers>
+        </Label>
+      </StackLayout>
+    </StackLayout>
+  </Grid>
+</welcome:WelcomePageXaml>

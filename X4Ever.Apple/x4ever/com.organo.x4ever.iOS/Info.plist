@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiresFullScreen</key>
+	<true/>
+	<key>UIStatusBarHidden</key>
+	<true/>
+	<key>UIRequiresPersistentWiFi</key>
+	<true/>
+	<key>XSAppIconAssets</key>
+	<string>Resources/Media.xcassets/AppIcons.appiconset</string>
+	<key>XSLaunchImageAssets</key>
+	<string>Resources/Media.xcassets/LaunchImages.launchimage</string>
+	<key>CFBundleDisplayName</key>
+	<string>X4Ever</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en-US</string>
+	<key>MinimumOSVersion</key>
+	<string>10.0</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.organo.xchallenge</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Allow X4Ever update Health information to track progress</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Allow X4Ever share Health information</string>
+	<key>kTCCServiceMediaLibrary</key>
+	<string>Allow X4Ever to play music files from your Music Library inside the app.</string>
+	<key>NSSiriUsageDescription</key>
+	<string>Allow X4Ever to control the app with voice command using Siri.</string>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Allow X4Ever to play music files from your Media Library inside the app.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allow X4Ever access to your Microphone to listen to the music.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow X4Ever to pick and upload photo for your Profile from your Photo Gallery.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Allow X4Ever to pick and upload photo for your Profile from your Photo Gallery.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow X4Ever to take, save and upload photo for your Profile using your Camera roll.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allow X4ever access to your current Location to set up and display appropriate items according to your current location.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Allow X4Ever to add and/or update Calendar dates.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Allow X4Ever to connect you with people in your Contacts</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Allow X4ever access your Location always to display items according to your location.</string>
+	<key>CFBundleVersion</key>
+	<string>2.3.3</string>
+</dict>
+</plist>
