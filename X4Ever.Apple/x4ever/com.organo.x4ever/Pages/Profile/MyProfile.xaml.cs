@@ -289,7 +289,7 @@ namespace com.organo.x4ever.Pages.Profile
                         }
                         catch (Exception e)
                         {
-                            new ExceptionHandler(TAG, e);
+                            ExceptionHandler exceptionHandler =  new ExceptionHandler(TAG, e);
                         }
                     }
                 }

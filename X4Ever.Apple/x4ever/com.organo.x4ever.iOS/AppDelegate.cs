@@ -251,19 +251,12 @@ namespace com.organo.x4ever.ios
                 var oldDeviceToken = _secureStorage.RetrieveStringFromBytes(Keys.DEVICE_TOKEN_IDENTITY) ?? "";
 
                 // Has the token changed?
-                if (!string.IsNullOrEmpty(oldDeviceToken) || !oldDeviceToken.Equals(DeviceToken))
+                if (!oldDeviceToken.Equals(DeviceToken))
                 {
                     //TODO: Put your own logic here to notify your server that the device token has changed/been created!
                     // Save new device token
                     _secureStorage.StoreBytesFromString(Keys.DEVICE_TOKEN_IDENTITY, DeviceToken);
-                    _secureStorage.StoreBytesFromString(Keys.DEVICE_TOKEN_CHANGED, CommonConstants.YES);
                 }
-                else
-                    _secureStorage.Delete(Keys.DEVICE_TOKEN_CHANGED);
-
-                // PREVIOUS CODE: COMMENTED
-                //var _deviceToken = deviceToken.ToString();
-                //base.RegisteredForRemoteNotifications(application, deviceToken);
             }
             catch (System.Exception ex)
             {

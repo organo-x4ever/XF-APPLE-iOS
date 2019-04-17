@@ -77,18 +77,9 @@ namespace com.organo.x4ever.Services
 
         public async Task GetAuthenticationAsync(Action callbackSuccess, Action callbackFailed)
         {
-            var token = await App.Configuration.GetUserToken();
-            if (!string.IsNullOrEmpty(token))
+            if (!string.IsNullOrEmpty(await App.Configuration.GetUserToken()))
             {
-                var request = new HttpRequestMessage()
-                {
-                    RequestUri = new Uri(ClientService.GetRequestUri(ControllerName, "authuser_v2")),
-                    Method = HttpMethod.Post,
-                };
-                request.Headers.Add(App.Configuration.AppConfig.TokenHeaderName, token);
-                request.Headers.Accept.Add(
-                    new MediaTypeWithQualityHeaderValue(HttpConstants.MEDIA_TYPE_TEXT_PLAIN));
-                var response = await ClientService.SendAsync(request);
+                var response = await ClientService.GetDataAsync(ControllerName, "authuser_v3");
                 var authenticationResult = await _authenticationService.GetDetailAsync(response);
                 if (authenticationResult != null)
                 {
@@ -133,8 +124,7 @@ namespace com.organo.x4ever.Services
 
             return string.IsNullOrEmpty(Message);
         }
-
-
+        
         // Unauthorized::REQUESTS
         public async Task<string> ChangeForgotPasswordAsync(string requestCode, string password)
         {

@@ -54,25 +54,18 @@ namespace com.organo.x4ever.Services
 
         public async Task<string> SaveDeviceToken()
         {
-            var tokenChanged =
-                DependencyService.Get<ISecureStorage>().RetrieveStringFromBytes(Keys.DEVICE_TOKEN_CHANGED) ?? "";
-
-            if ((!string.IsNullOrEmpty(tokenChanged) && tokenChanged.Equals(CommonConstants.YES)))
+            var deviceToken = DependencyService.Get<ISecureStorage>()
+                .RetrieveStringFromBytes(Keys.DEVICE_TOKEN_IDENTITY);
+            if (!string.IsNullOrEmpty(deviceToken))
             {
-                var deviceToken = DependencyService.Get<ISecureStorage>()
-                    .RetrieveStringFromBytes(Keys.DEVICE_TOKEN_IDENTITY);
-                if (!string.IsNullOrEmpty(deviceToken))
+                return await Insert(new UserPushTokenModel()
                 {
-                    var identity = string.Format(TextResources.AppVersion,
-                        App.Configuration.AppConfig.ApplicationVersion);
-                    return await Insert(new UserPushTokenModel()
-                    {
-                        DeviceToken = deviceToken,
-                        IssuedOn = DateTime.Now,
-                        DeviceIdentity = identity,
-                        DeviceIdiom = Device.Idiom.ToString(),
-                    });
-                }
+                    DeviceToken = deviceToken,
+                    IssuedOn = DateTime.Now,
+                    DeviceIdentity = string.Format(TextResources.AppVersion,
+                        App.Configuration.AppConfig.ApplicationVersion),
+                    DeviceIdiom = Device.Idiom.ToString(),
+                });
             }
 
             return "";
