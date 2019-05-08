@@ -40,6 +40,7 @@ namespace com.organo.x4ever.ios
             AppDomain.CurrentDomain.UnhandledException += CurrentDomainOnUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
             ImageCircleRenderer.Init();
+            FloatingActionButtonViewRenderer.Init();
             _secureStorage = DependencyService.Get<ISecureStorage>();
             try
             {

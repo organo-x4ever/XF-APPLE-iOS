@@ -1,11 +1,13 @@
-﻿using System;
+﻿
+using com.organo.x4ever.Globals;
+using com.organo.x4ever.Localization;
+using com.organo.x4ever.Pages;
+using com.organo.x4ever.Services;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using com.organo.x4ever.Localization;
-using com.organo.x4ever.Pages;
-using com.organo.x4ever.Services;
 using Xamarin.Forms;
 
 namespace com.organo.x4ever.ViewModels.Base
@@ -13,6 +15,7 @@ namespace com.organo.x4ever.ViewModels.Base
     public class BaseViewModel : INotifyPropertyChanged
     {
         public INavigation Navigation { get; set; }
+        private readonly IHelper _helper;
 
         private static IInformationMessageServices InformationServices =>
             DependencyService.Get<IInformationMessageServices>();
@@ -20,6 +23,8 @@ namespace com.organo.x4ever.ViewModels.Base
         public BaseViewModel(INavigation navigation = null)
         {
             Navigation = navigation;
+            _helper = DependencyService.Get<IHelper>();
+            IsUserSettingVisible = false;
         }
 
         public bool IsInitialized { get; set; }
@@ -44,7 +49,7 @@ namespace com.organo.x4ever.ViewModels.Base
         {
             if (Navigation != null)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
                 Device.BeginInvokeOnMainThread(async () => { await Navigation.PushModalAsync(page); });
             }
         }
@@ -53,7 +58,7 @@ namespace com.organo.x4ever.ViewModels.Base
         {
             if (Navigation != null)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
                 Device.BeginInvokeOnMainThread(async () => { await Navigation.PopModalAsync(); });
             }
         }
@@ -62,7 +67,7 @@ namespace com.organo.x4ever.ViewModels.Base
         {
             if (Navigation != null)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
                 Device.BeginInvokeOnMainThread(async () => { await Navigation.PushAsync(page); });
             }
         }
@@ -71,7 +76,7 @@ namespace com.organo.x4ever.ViewModels.Base
         {
             if (Navigation != null)
             {
-                await Task.Delay(TimeSpan.FromSeconds(1));
+                await Task.Delay(TimeSpan.FromMilliseconds(100));
                 Device.BeginInvokeOnMainThread(async () => { await Navigation.PopAsync(); });
             }
         }
@@ -412,5 +417,49 @@ namespace com.organo.x4ever.ViewModels.Base
                 }));
             }
         }
+        
+        #region User Settings Controls
+
+        private bool _isUserSettingVisible;
+        public const string IsUserSettingVisiblePropertyName = "IsUserSettingVisible";
+
+        public bool IsUserSettingVisible
+        {
+            get => _isUserSettingVisible;
+            set => SetProperty(ref _isUserSettingVisible, value, IsUserSettingVisiblePropertyName);
+        }
+
+        private Action _userSettingAction;
+        public const string UserSettingActionPropertyName = "UserSettingAction";
+
+        /// <summary>
+        /// User Setting Action command
+        /// </summary>
+        public Action UserSettingAction
+        {
+            get => _userSettingAction;
+            set => SetProperty(ref _userSettingAction, value, UserSettingActionPropertyName);
+        }
+
+        private ICommand _userSettingCommand;
+
+        /// <summary>
+        /// User Setting Command
+        /// </summary>
+        public ICommand UserSettingCommand
+        {
+            get
+            {
+                return _userSettingCommand ?? (_userSettingCommand = new Command((obj) =>
+                {
+                    if (UserSettingAction != null)
+                    {
+                        UserSettingAction?.Invoke();
+                    }
+                }));
+            }
+        }
+
+        #endregion User Settings Controls
     }
 }

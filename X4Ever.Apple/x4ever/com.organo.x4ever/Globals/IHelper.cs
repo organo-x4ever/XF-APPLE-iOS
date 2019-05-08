@@ -32,8 +32,6 @@ namespace com.organo.x4ever.Globals
 
         ImageSource GetFileSource(string fileName, FileType fileType);
         object GetFileObject(string fileName, FileType fileType);
-
-        string Encrypt(string input, string key = "");
-        string Decrypt(string input, string key = "");
+        string GetUniqueCode();
     }
 }

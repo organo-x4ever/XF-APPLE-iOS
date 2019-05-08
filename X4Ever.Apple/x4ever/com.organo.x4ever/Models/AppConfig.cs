@@ -1,4 +1,5 @@
-﻿namespace com.organo.x4ever.Models
+﻿
+namespace com.organo.x4ever.Models
 {
     public class AppConfig
     {
@@ -43,6 +44,7 @@
 
             TOP_BAR_LOGO = string.Empty;
             TOP_BAR_MENU = string.Empty;
+            TOP_BAR_SETTING = string.Empty;
             TOP_BAR_CLOSE = string.Empty;
             MAIN_PAGE_LOGO = string.Empty;
             MAIN_PAGE_XCHALLENGE_LOGO = string.Empty;
@@ -83,7 +85,6 @@
             IMAGE_EYE_PASSWORD = string.Empty;
         }
 
-
         public string BaseUrl { get; set; }
         public string BaseUrl_Development { get; set; }
         public string AuthenticationUrl { get; set; }
@@ -123,6 +124,7 @@
         // Images Height and Width
         public string TOP_BAR_LOGO { get; set; }
         public string TOP_BAR_MENU { get; set; }
+        public string TOP_BAR_SETTING { get; set; }
         public string TOP_BAR_CLOSE { get; set; }
         public string MAIN_PAGE_LOGO { get; set; }
         public string MAIN_PAGE_XCHALLENGE_LOGO { get; set; }

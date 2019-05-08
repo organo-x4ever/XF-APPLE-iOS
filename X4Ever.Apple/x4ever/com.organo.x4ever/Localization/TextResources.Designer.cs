@@ -3500,11 +3500,74 @@ namespace com.organo.x4ever.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to General Message.
+        /// </summary>
+        internal static string Notification_GeneralMessage {
+            get {
+                return ResourceManager.GetString("Notification_GeneralMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Intimation.
+        /// </summary>
+        internal static string Notification_Intimation {
+            get {
+                return ResourceManager.GetString("Notification_Intimation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Promotional.
+        /// </summary>
+        internal static string Notification_Promotional {
+            get {
+                return ResourceManager.GetString("Notification_Promotional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Special Offer.
+        /// </summary>
+        internal static string Notification_SpecialOffer {
+            get {
+                return ResourceManager.GetString("Notification_SpecialOffer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Time to submit your weight.
         /// </summary>
         internal static string NOTIFICATION_TITLE_SubmitWeight {
             get {
                 return ResourceManager.GetString("NOTIFICATION_TITLE_SubmitWeight", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version Update.
+        /// </summary>
+        internal static string Notification_VersionUpdate {
+            get {
+                return ResourceManager.GetString("Notification_VersionUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Weight Submit.
+        /// </summary>
+        internal static string Notification_WeightSubmitReminder {
+            get {
+                return ResourceManager.GetString("Notification_WeightSubmitReminder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Notifications.
+        /// </summary>
+        internal static string Notifications {
+            get {
+                return ResourceManager.GetString("Notifications", resourceCulture);
             }
         }
         

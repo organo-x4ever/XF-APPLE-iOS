@@ -126,7 +126,7 @@ namespace com.organo.x4ever.ViewModels.Profile
                     Device.BeginInvokeOnMainThread(async () =>
                     {
                         await App.CurrentApp.MainPage.Navigation.PushModalAsync(
-                            new Pages.Milestone.UserMilestonePage(Root, this));
+                            new Pages.Milestone.UserMilestonePage(Root, null));
                     });
                 }
             }
@@ -334,7 +334,7 @@ namespace com.organo.x4ever.ViewModels.Profile
             set { SetProperty(ref seperator, value, SeperatorPropertyName); }
         }
 
-        private Xamarin.Forms.Page TrackerPage => new TrackerLogPage(this);
+        private Xamarin.Forms.Page TrackerPage => new TrackerLogPage(null);
         private bool showTrackerDetail;
         public const string ShowTrackerDetailPropertyName = "ShowTrackerDetail";
 

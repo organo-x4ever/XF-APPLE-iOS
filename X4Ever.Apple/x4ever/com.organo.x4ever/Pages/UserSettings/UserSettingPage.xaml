@@ -7,21 +7,11 @@
     xmlns:controls="clr-namespace:com.organo.x4ever.Controls;assembly=com.organo.x4ever"
     xmlns:localization="clr-namespace:com.organo.x4ever.Localization;assembly=com.organo.x4ever"
     xmlns:statics="clr-namespace:com.organo.x4ever.Statics;assembly=com.organo.x4ever">
-  <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand">
-      <Grid VerticalOptions="FillAndExpand">
-          <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <Grid.RowDefinitions>
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="Auto" />
-          </Grid.RowDefinitions>
-          <StackLayout Orientation="Vertical" Grid.Row="0" Margin="0">
-              <Label Text="{localization:Translate UserSettings}" Style="{DynamicResource labelStyleXLargeHeader}" HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0" />
-          </StackLayout>
-          <StackLayout Grid.Row="1" Orientation="Vertical" VerticalOptions="Start" HorizontalOptions="CenterAndExpand">
-            <TableView Intent="Settings" VerticalOptions="FillAndExpand" Margin="0" BackgroundColor="{x:Static statics:Palette._Transparent}">
-              <TableRoot>
+  <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="15,15,15,0">
+      <Label Text="{localization:Translate UserSettings}" Style="{DynamicResource labelStyleXLargeHeader}" HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0" />
+      <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Margin="0,0,0,15">
+          <TableView Intent="Settings" VerticalOptions="FillAndExpand" Margin="0" BackgroundColor="{x:Static statics:Palette._Transparent}">
+            <TableRoot>
                 <TableSection Title="{localization:Translate Settings}">
                   <ViewCell>
                     <StackLayout Orientation="Horizontal" VerticalOptions="CenterAndExpand">
@@ -44,7 +34,6 @@
               </TableRoot>
             </TableView>
           </StackLayout>
-      </Grid>
-    <controls:FooterView/>
+        <controls:FooterView/>
   </StackLayout>
 </page:UserSettingPageXaml>

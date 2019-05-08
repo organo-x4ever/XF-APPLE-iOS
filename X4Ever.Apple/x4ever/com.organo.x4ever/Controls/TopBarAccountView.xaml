@@ -8,7 +8,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="35" />
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="35" />
+            <ColumnDefinition Width="45" />
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="60" />
@@ -19,10 +19,17 @@
                 <TapGestureRecognizer Command="{Binding ShowSideMenuCommand}" />
             </StackLayout.GestureRecognizers>
         </StackLayout>
-        <StackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,5">
+        <StackLayout Grid.Column="1" HorizontalOptions="Center" VerticalOptions="End" Margin="10,0,0,5">
             <Image Source="{extensions:ImageResource TOP_BAR_LOGO}" Style="{DynamicResource imageLogoTransparent}">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding DeveloperCommand}" />
+                </Image.GestureRecognizers>
+            </Image>
+        </StackLayout>
+        <StackLayout Grid.Column="2" HorizontalOptions="Center" VerticalOptions="End" IsVisible="{Binding IsUserSettingVisible}">
+            <Image Source="{extensions:ImageResource TOP_BAR_SETTING}" Style="{DynamicResource imageLogoSetting}" HeightRequest="32" WidthRequest="32" Margin="0,0,20,0">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer NumberOfTapsRequired="1" Command="{Binding UserSettingCommand}" />
                 </Image.GestureRecognizers>
             </Image>
         </StackLayout>

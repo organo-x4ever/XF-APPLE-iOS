@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using com.organo.x4ever.Converters;
+﻿using com.organo.x4ever.Converters;
 using com.organo.x4ever.Extensions;
 using com.organo.x4ever.Globals;
 using com.organo.x4ever.Helpers;
@@ -11,12 +6,16 @@ using com.organo.x4ever.Localization;
 using com.organo.x4ever.Models;
 using com.organo.x4ever.Models.User;
 using com.organo.x4ever.Models.Validation;
-using com.organo.x4ever.Pages;
 using com.organo.x4ever.Services;
 using com.organo.x4ever.Statics;
 using com.organo.x4ever.Utilities;
 using com.organo.x4ever.ViewModels.Base;
 using com.organo.x4ever.ViewModels.Profile;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using Xamarin.Forms;
 
 namespace com.organo.x4ever.ViewModels.Milestone
@@ -312,17 +311,12 @@ namespace com.organo.x4ever.ViewModels.Milestone
                     {
                         SaveGender();
                         SaveSuccessful(string.Empty);
-                        await Task.Delay(TimeSpan.FromSeconds(1));
+                        await Task.Delay(TimeSpan.FromMilliseconds(500));
                         Device.BeginInvokeOnMainThread(async () =>
                         {
                             await App.CurrentApp.MainPage.Navigation.PopModalAsync();
                         });
                     }
-                }
-                else if (response.Contains(HttpConstants.UNAUTHORIZED))
-                {
-                    await App.LogoutAsync();
-                    App.GoToAccountPage();
                 }
                 else
                     SetActivityResource(showError: true, errorMessage: response, modalWindow: true);
@@ -522,10 +516,10 @@ namespace com.organo.x4ever.ViewModels.Milestone
             set { SetProperty(ref _userMetas, value, UserMetasPropertyName); }
         }
 
-        private MyProfileViewModel profileViewModel;
+        private ProfileEnhancedViewModel profileViewModel;
         public const string ProfileViewModelPropertyName = "ProfileViewModel";
 
-        public MyProfileViewModel ProfileViewModel
+        public ProfileEnhancedViewModel ProfileViewModel
         {
             get { return profileViewModel; }
             set { SetProperty(ref profileViewModel, value, ProfileViewModelPropertyName); }

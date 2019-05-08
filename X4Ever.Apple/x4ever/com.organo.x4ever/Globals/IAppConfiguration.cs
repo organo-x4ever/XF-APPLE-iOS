@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿
+using System.Collections.Generic;
 using com.organo.x4ever.Models;
 using com.organo.x4ever.Models.User;
 using com.organo.x4ever.Notification;
 using System.Globalization;
 using System.Threading.Tasks;
+using com.organo.x4ever.ViewModels.Profile;
 using Xamarin.Forms;
 
 namespace com.organo.x4ever.Globals
@@ -12,7 +14,6 @@ namespace com.organo.x4ever.Globals
     {
         AppConfig AppConfig { get; set; }
         UserSetting UserSetting { get; set; }
-        string UserToken { get; set; }
         string BackgroundImage { get; set; }
         Color BackgroundColor { get; set; }
         Color StatusBarColor { get; set; }
@@ -23,21 +24,27 @@ namespace com.organo.x4ever.Globals
         bool IsConnected { get; set; }
         bool IsAnimationAllowed { get; set; }
         bool IsMenuLoaded { get; set; }
+        bool IsProfileEditAllowed { get; set; }
+        string UserToken { get; }
         Task InitAsync();
-        Task SetUserLanguage(string languageCode);
-        Task SetWeightVolume(string weightVolume);
-        Task<string> GetUserToken();
-        string GetToken();
-        Task SetUserToken(string token);
+        Task SetUserConfigurationAsync(string token, string languageCode, string weightVolume);
+        Task SetUserLanguageAsync(string languageCode);
+        Task SetWeightVolumeAsync(string weightVolume);
+        Task SetUserTokenAsync(string token);
+        string GetUserToken();
+        Task<string> GetUserTokenAsync();
+        Task<bool> IsUserTokenExistsAsync();
+        Task DeleteUserTokenAsync();
+
         void Initial(Page page, bool showBackgroundImage = false);
         Task InitialAsync(Page page, bool showBackgroundImage = false);
         void Initial(Page page, Color backgroundColor, bool showBackgroundImage = false);
         Task InitialAsync(Page page, Color backgroundColor, bool showBackgroundImage = false);
-        Task GetActivity(string action);
+        Task GetActivityAsync(string action);
         Task GetConnectionInfoAsync();
         void GetConnectionInfo();
-        void SetImage(string imageIdentity, string badgeImage);
         Task SetImageAsync(string imageIdentity, string badgeImage);
+        void SetImage(string imageIdentity, string badgeImage);
         ImageSize GetImageSizeByID(string imageIdentity);
         Task<ImageSize> GetImageSizeByIDAsync(string imageIdentity);
         string GetApplication();
@@ -47,5 +54,12 @@ namespace com.organo.x4ever.Globals
         bool IsVersionPrompt();
         void VersionPrompted();
         void DeleteVersionPrompt();
+        void SetUserKey();
+        string GetUserKey();
+        bool IsUserKeyExists();
+        void DeleteUserKey();
+        void SetUserGraph(ChartType chartType);
+        ChartType GetUserGraph();
+        void DeleteUserGraph();
     }
 }

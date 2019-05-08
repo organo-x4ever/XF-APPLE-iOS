@@ -43,6 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Animated\AnimatedButton.cs" />
+    <Compile Include="Animated\AnimatedImage.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -76,6 +77,7 @@
     </Compile>
     <Compile Include="Controls\VolumeButton.cs" />
     <Compile Include="Converters\BoolToLabelOpacityConverter.cs" />
+    <Compile Include="Converters\BoolToStringConverter.cs" />
     <Compile Include="Converters\ConvertableConverter.cs" />
     <Compile Include="Converters\CurrencyDoubleConverter.cs" />
     <Compile Include="Converters\DoubleToIntConverter.cs" />
@@ -133,6 +135,7 @@
     <Compile Include="Models\CountryProvince.cs" />
     <Compile Include="Models\Log.cs" />
     <Compile Include="Models\Menu.cs" />
+    <Compile Include="Models\Notifications\UserNotificationSetting.cs" />
     <Compile Include="Models\Notifications\UserPushTokenModel.cs" />
     <Compile Include="Models\Province.cs" />
     <Compile Include="Models\User\MetaPivot.cs" />
@@ -165,8 +168,14 @@
     <Compile Include="Pages\MenuGridPage.xaml.cs">
       <DependentUpon>MenuGridPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Notification\NotificationSettingPage.xaml.cs">
+      <DependentUpon>NotificationSettingPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\OGX\OGXSystemPage.xaml.cs">
       <DependentUpon>OGXSystemPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Profile\ProfileEnhanced.xaml.cs">
+      <DependentUpon>ProfileEnhanced.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\Profile\TrackerLogPage.xaml.cs">
       <DependentUpon>TrackerLogPage.xaml</DependentUpon>
@@ -197,6 +206,7 @@
     <Compile Include="Services\IProvinceServices.cs" />
     <Compile Include="Services\ITestTokenCancellation.cs" />
     <Compile Include="Services\ITrackerPivotService.cs" />
+    <Compile Include="Services\IUserNotificationServices.cs" />
     <Compile Include="Services\IUserPivotService.cs" />
     <Compile Include="Services\IUserPushTokenServices.cs" />
     <Compile Include="Services\IXEncryptionService.cs" />
@@ -208,6 +218,7 @@
     <Compile Include="Services\SecureStorage.cs" />
     <Compile Include="Services\TestTokenCancellation.cs" />
     <Compile Include="Services\TrackerPivotService.cs" />
+    <Compile Include="Services\UserNotificationServices.cs" />
     <Compile Include="Services\UserPivotService.cs" />
     <Compile Include="Services\UserPushTokenServices.cs" />
     <Compile Include="Services\YoutubeDataServices.cs" />
@@ -461,9 +472,12 @@
     <Compile Include="ViewModels\Message\MessageViewModel.cs" />
     <Compile Include="ViewModels\Milestone\UserMilestoneViewModel.cs" />
     <Compile Include="ViewModels\News\NewsViewModel.cs" />
+    <Compile Include="ViewModels\Notification\NotificationSettingViewModel.cs" />
     <Compile Include="ViewModels\OGX\OGXViewModel.cs" />
     <Compile Include="ViewModels\Profile\ChartType.cs" />
     <Compile Include="ViewModels\Profile\MyProfileViewModel.cs" />
+    <Compile Include="ViewModels\Profile\ProfileEnhancedViewModel.cs" />
+    <Compile Include="ViewModels\Profile\ProfileSettingViewModel.cs" />
     <Compile Include="ViewModels\Profile\SettingViewModel.cs" />
     <Compile Include="ViewModels\Registration\RegisterViewModel.cs" />
     <Compile Include="ViewModels\Registration\TermAndConditionViewModel.cs" />
@@ -474,6 +488,7 @@
     <Compile Include="ViewModels\Testimonial\TestimonialPhotoViewModel.cs" />
     <Compile Include="ViewModels\Testimonial\TestimonialViewModel.cs" />
     <Compile Include="ViewModels\TrainingVideo\TrainingVideoViewModel.cs" />
+    <Compile Include="ViewModels\UserSettings\UserSettingsViewModel.cs" />
     <Compile Include="ViewModels\Video\PlaylistViewModel.cs" />
     <Compile Include="ViewModels\Welcome\WelcomeViewModel.cs" />
     <Compile Include="ViewModels\YouTube\YoutubeViewModel.cs" />
@@ -692,6 +707,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="docs.xml" />
     <Content Include="Helpers\CrossPushNotificationListener.txt" />
     <Content Include="Microcharts\package-installs.txt" />
     <Content Include="PluginsHelp\ConnectivityReadme.txt" />
@@ -946,6 +962,18 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pages\Profile\ProfileEnhanced.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pages\Notification\NotificationSettingPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\..\packages\Xamarin.Forms.2.5.0.121934\build\portable-win+net45+wp80+win81+wpa81\Xamarin.Forms.targets" Condition="Exists('..\..\packages\Xamarin.Forms.2.5.0.121934\build\portable-win+net45+wp80+win81+wpa81\Xamarin.Forms.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
@@ -954,8 +982,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\packages\Xamarin.Forms.2.5.0.121934\build\portable-win+net45+wp80+win81+wpa81\Xamarin.Forms.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Xamarin.Forms.2.5.0.121934\build\portable-win+net45+wp80+win81+wpa81\Xamarin.Forms.targets'))" />
     <Error Condition="!Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets'))" />
-    <Error Condition="!Exists('..\..\packages\LiveXAML.2.1.36\build\LiveXAML.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\LiveXAML.2.1.36\build\LiveXAML.targets'))" />
   </Target>
   <Import Project="..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
-  <Import Project="..\..\packages\LiveXAML.2.1.36\build\LiveXAML.targets" Condition="Exists('..\..\packages\LiveXAML.2.1.36\build\LiveXAML.targets')" />
 </Project>

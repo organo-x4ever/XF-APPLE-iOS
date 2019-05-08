@@ -12,6 +12,7 @@ using com.organo.x4ever.Pages.Profile;
 using com.organo.x4ever.Pages.Rewards;
 using com.organo.x4ever.Pages.Video;
 using com.organo.x4ever.Pages.YouTube;
+using com.organo.x4ever.Statics;
 using com.organo.x4ever.ViewModels.Base;
 using System;
 using System.Collections.Generic;
@@ -74,7 +75,7 @@ namespace com.organo.x4ever.Pages
                     switch (id)
                     {
                         case MenuType.MyProfile:
-                            var page = new XNavigationPage(new MyProfile(this)
+                            var page = new XNavigationPage(new ProfileEnhanced(this)
                             {
                                 Title = TextResources.MainTabs_MyProfile,
                                 Icon = new FileImageSource {File = TextResources.MainTabs_MyProfile_Icon},
@@ -242,6 +243,8 @@ namespace com.organo.x4ever.Pages
 
         private void Init()
         {
+            BarBackgroundColor = Palette._MainAccent;
+            BarTextColor = Palette._MainBackground;
             SetHasBackButton(this.CurrentPage, false);
             SetHasNavigationBar(this.CurrentPage, false);
         }
@@ -291,6 +294,7 @@ namespace com.organo.x4ever.Pages
         public bool IsSelected { get; set; }
         public Style IconStyle { get; set; }
         public Thickness ItemPadding { get; set; }
+        public bool IsVisible { get; set; }
 
         private Style _textStyle;
         public const string TextStylePropertyName = "TextStyle";

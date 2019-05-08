@@ -78,7 +78,7 @@ namespace com.organo.x4ever.ViewModels.Profile
                     ImageUserSetting = ImageUserSettingPath;
 
                     //Content
-                    Content = new ProfileSetting(Root, this).Content;
+                    //Content = new ProfileSetting(Root, this).Content;
 
                     CountryName = string.Empty;
                     CityName = string.Empty;
@@ -105,7 +105,7 @@ namespace com.organo.x4ever.ViewModels.Profile
                     ImageUserSetting = ImageUserSettingPath;
 
                     //Content
-                    Content = new ChangePasswordPage(Root, this).Content;
+                    //Content = new ChangePasswordPage(Root, this).Content;
                     break;
 
                 case TabTitle.UserSettings:
@@ -128,7 +128,7 @@ namespace com.organo.x4ever.ViewModels.Profile
 
                     //Content
                     WeightVolumeClick_Action = null;
-                    Content = new UserSettingPage(Root, this).Content;
+                    //Content = new UserSettingPage(Root, this).Content;
                     break;
             }
         }
@@ -174,7 +174,7 @@ namespace com.organo.x4ever.ViewModels.Profile
             var response = await _settingService.UpdateUserLanguageAsync(requestModel);
             if (response == HttpConstants.SUCCESS)
             {
-                await App.Configuration.SetUserLanguage(requestModel.LanguageCode);
+                await App.Configuration.SetUserLanguageAsync(requestModel.LanguageCode);
                 App.GoToAccountPage(true);
             }
         }
@@ -207,7 +207,7 @@ namespace com.organo.x4ever.ViewModels.Profile
             var response = await _settingService.UpdateUserWeightVolumeAsync(requestModel);
             if (response == HttpConstants.SUCCESS)
             {
-                await App.Configuration.SetWeightVolume(requestModel.WeightVolume);
+                await App.Configuration.SetWeightVolumeAsync(requestModel.WeightVolume);
                 App.GoToAccountPage(true);
             }
         }

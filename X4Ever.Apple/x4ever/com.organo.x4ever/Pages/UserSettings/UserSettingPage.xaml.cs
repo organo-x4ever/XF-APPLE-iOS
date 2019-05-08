@@ -8,26 +8,20 @@ using System;
 using System.Threading.Tasks;
 using com.organo.x4ever.Handler;
 using Xamarin.Forms;
+using com.organo.x4ever.ViewModels.UserSettings;
 
 namespace com.organo.x4ever.Pages.UserSettings
 {
     public partial class UserSettingPage : UserSettingPageXaml
     {
-        private readonly SettingsViewModel _model;
+        private readonly UserSettingsViewModel _model;
 
-        public UserSettingPage(RootPage root, SettingsViewModel model)
+        public UserSettingPage()
         {
             try
             {
                 InitializeComponent();
-                App.Configuration.Initial(this);
-                NavigationPage.SetHasNavigationBar(this, false);
-                _model = model;
-                model.Root = root;
-                BindingContext = _model;
-                _model.CurrentPassword = string.Empty;
-                _model.NewPassword = string.Empty;
-                _model.ConfirmNewPassword = string.Empty;
+                _model = new UserSettingsViewModel();
                 Init();
             }
             catch (Exception ex)
@@ -38,6 +32,10 @@ namespace com.organo.x4ever.Pages.UserSettings
 
         public sealed override async void Init(object obj = null)
         {
+            await App.Configuration.InitialAsync(this);
+            NavigationPage.SetHasNavigationBar(this, true);
+            BindingContext = _model;
+            _model.SetActivityResource();
             await _model.LoadAppLanguages(OnLanguageRetrieve);
             await _model.LoadWeightVolume(BindWeightVolume);
         }
@@ -79,7 +77,7 @@ namespace com.organo.x4ever.Pages.UserSettings
         }
     }
 
-    public abstract class UserSettingPageXaml : ModelBoundContentPage<SettingsViewModel>
+    public abstract class UserSettingPageXaml : ModelBoundContentPage<UserSettingsViewModel>
     {
     }
 }

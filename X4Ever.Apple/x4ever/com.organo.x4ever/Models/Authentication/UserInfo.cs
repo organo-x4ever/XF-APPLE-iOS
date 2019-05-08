@@ -19,6 +19,7 @@ namespace com.organo.x4ever.Models.Authentication
             IsMetaExists = false;
             IsAddressExists = false;
             IsTrackerExists = false;
+            UserKey = string.Empty;
         }
 
         // Summary: Create user information copied from another UserInfo object
@@ -38,6 +39,7 @@ namespace com.organo.x4ever.Models.Authentication
             IsMetaExists = other.IsMetaExists;
             IsAddressExists = false;
             IsTrackerExists = other.IsTrackerExists;
+            UserKey = other.UserKey;
         }
 
         /// <summary>
@@ -120,5 +122,10 @@ namespace com.organo.x4ever.Models.Authentication
         /// User Tracker Exists
         /// </summary>
         public bool IsTrackerExists { get; set; }
+        
+        /// <summary>
+        /// User Key
+        /// </summary>
+        public string UserKey { get; set; }
     }
 }

@@ -262,15 +262,10 @@ namespace com.organo.x4ever.Globals
                     return ImageSource.FromFile(filePath);
             }
         }
-
-        public string Encrypt(string input, string key = "")
+        
+        public string GetUniqueCode()
         {
-            return input;
-        }
-
-        public string Decrypt(string input, string key = "")
-        {
-            return input;
+            return Guid.NewGuid().ToString().Replace("-","").ToUpper();
         }
     }
 }

@@ -10,47 +10,65 @@ using Xamarin.Forms.Xaml;
 
 namespace com.organo.x4ever.Pages.Profile
 {
-    public partial class TrackerLogPage : TrackerLogPageXaml
+    public partial class TrackerLogPage : TrackerLogPageXaml, IDisposable
     {
-        private MyProfileViewModel _model;
+        private ProfileEnhancedViewModel _model;
 
-        public TrackerLogPage(MyProfileViewModel model)
+        public TrackerLogPage(ProfileEnhancedViewModel model)
         {
-            InitializeComponent();
-            _model = model;
-            Init();
+            try
+            {
+                InitializeComponent();
+                _model = model;
+                Init();
+            }
+            catch (Exception ex)
+            {
+                _ = ex;
+            }
         }
 
         public sealed override async void Init(object obj = null)
         {
             BindingContext = _model;
             await App.Configuration.InitialAsync(this);
-            NavigationPage.SetHasNavigationBar(this, false);
-            _model.Navigation = App.CurrentApp.MainPage.Navigation;
+            NavigationPage.SetHasNavigationBar(this, true);
             SetGridTracker();
         }
 
         private async void SetGridTracker()
         {
-            await Task.Factory.StartNew(() =>
+            await Task.Factory.StartNew(async () =>
             {
                 gridTracker.ProfileModel = _model;
                 gridTracker.Source = _model.UserTrackers;
                 gridTracker.CloseAction = async () =>
                 {
                     _model.ShowTrackerDetail = false;
-                    //Device.BeginInvokeOnMainThread(async () =>
-                    //{
-                    await _model.PopModalAsync();
+                    await _model.PopAsync();
                     await gridTracker.ProfileModel.GetUserAsync(
                         gridTracker.ProfileModel.UserDetail.IsTrackerRequiredAfterDelete);
-                    //});
                 };
+                await Task.Delay(TimeSpan.FromMilliseconds(1000));
+                _model.ShowTrackerDetail = false;
             });
         }
+        
+        public void Dispose()
+        {
+            _model.ShowTrackerDetail = false;
+            if (!isDispose)
+            {
+                isDispose = true;
+                gridTracker.Dispose();
+                GC.SuppressFinalize(this);
+            }
+        }
+
+        private bool isDispose = false;
     }
 
-    public abstract class TrackerLogPageXaml : ModelBoundContentPage<MyProfileViewModel>
+    public abstract class TrackerLogPageXaml : ModelBoundContentPage<ProfileEnhancedViewModel>
     {
     }
 }

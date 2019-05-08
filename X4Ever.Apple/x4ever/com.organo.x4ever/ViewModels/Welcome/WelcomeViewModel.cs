@@ -42,7 +42,7 @@ namespace com.organo.x4ever.ViewModels.Welcome
             CrossMediaManager.Current.VolumeManager.CurrentVolume = vol;
             CrossMediaManager.Current.VolumeManager.Mute = true;
             await ShowButtonAsync();
-            if (!string.IsNullOrEmpty(await App.Configuration.GetUserToken()))
+            if (await App.Configuration.IsUserTokenExistsAsync())
                 await App.LogoutAsync();
         }
 

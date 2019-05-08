@@ -11,26 +11,24 @@ using com.organo.x4ever.Permissions;
 using System.Threading.Tasks;
 
 [assembly: Dependency(typeof(DevicePermissionServices))]
+
 namespace com.organo.x4ever.ios.Permissions
 {
     public class DevicePermissionServices : IDevicePermissionServices
     {
         public async Task<bool> RequestCameraPermission()
         {
-            var result = true;
-            return result;
+            return await Task.Factory.StartNew(() => true);
         }
 
         public async Task<bool> RequestReadStoragePermission()
         {
-            var result = true;
-            return result;
+            return await Task.Factory.StartNew(() => true);
         }
 
         public async Task<bool> RequestWriteStoragePermission()
         {
-            var result = true;
-            return result;
+            return await Task.Factory.StartNew(() => true);
         }
     }
 }

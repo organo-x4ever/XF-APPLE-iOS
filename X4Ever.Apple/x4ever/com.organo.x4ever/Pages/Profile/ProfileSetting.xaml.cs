@@ -13,27 +13,19 @@ using Xamarin.Forms;
 
 namespace com.organo.x4ever.Pages.Profile
 {
-    public partial class ProfileSetting : ProfileSettingXaml
+    public partial class ProfileSetting : ProfileSettingXaml, IDisposable
     {
-        private readonly SettingsViewModel _model;
+        private readonly ProfileSettingViewModel _model;
         private readonly IMetaPivotService _metaPivotService;
 
-        public ProfileSetting(RootPage root, SettingsViewModel model)
+        public ProfileSetting()
         {
             try
             {
                 InitializeComponent();
-                App.Configuration.InitialAsync(this);
-                NavigationPage.SetHasNavigationBar(this, false);
-                _model = model;
-                _model.Root = root;
-                BindingContext = _model;
-                _model.SetActivityResource();
-                _model.CurrentPassword = string.Empty;
-                _model.NewPassword = string.Empty;
-                _model.ConfirmNewPassword = string.Empty;
-                Init();
+                _model = new ProfileSettingViewModel();
                 _metaPivotService = DependencyService.Get<IMetaPivotService>();
+                Init();
             }
             catch (Exception ex)
             {
@@ -42,8 +34,12 @@ namespace com.organo.x4ever.Pages.Profile
             }
         }
 
-        public sealed override void Init(object obj = null)
+        public sealed override async void Init(object obj = null)
         {
+            await App.Configuration.InitialAsync(this);
+            NavigationPage.SetHasNavigationBar(this, true);
+            BindingContext = _model;
+            _model.SetActivityResource();
             pickerCountry.SelectedIndexChanged += (sender1, e1) =>
             {
                 if (pickerCountry.SelectedItem != null && _model.ProfileLoadingComplete)
@@ -60,24 +56,23 @@ namespace com.organo.x4ever.Pages.Profile
 
         private async Task UpdateProfileAsync()
         {
-            await Task.Run(() => { _model.SetActivityResource(false, true); });
+            _model.SetActivityResource(false, true);
             if (Validate())
             {
                 List<Meta> metaList = new List<Meta>();
-                metaList.Add(_metaPivotService.AddMeta(_model.CountryName, MetaConstants.COUNTRY, MetaConstants.COUNTRY,
-                    MetaConstants.LABEL));
-                metaList.Add(_metaPivotService.AddMeta(_model.Address, MetaConstants.ADDRESS, MetaConstants.ADDRESS,
-                    MetaConstants.LABEL));
-                metaList.Add(_metaPivotService.AddMeta(_model.CityName, MetaConstants.CITY, MetaConstants.CITY,
-                    MetaConstants.LABEL));
-                metaList.Add(_metaPivotService.AddMeta(_model.StateName, MetaConstants.STATE, MetaConstants.STATE,
-                    MetaConstants.LABEL));
-                metaList.Add(_metaPivotService.AddMeta(_model.PostalCode, MetaConstants.POSTAL_CODE,
-                    MetaConstants.POSTAL_CODE, MetaConstants.LABEL));
+                metaList.Add(_metaPivotService.AddMeta(_model.CountryName, MetaConstants.COUNTRY, MetaConstants.COUNTRY, MetaConstants.LABEL));
+                metaList.Add(_metaPivotService.AddMeta(_model.Address, MetaConstants.ADDRESS, MetaConstants.ADDRESS, MetaConstants.LABEL));
+                metaList.Add(_metaPivotService.AddMeta(_model.CityName, MetaConstants.CITY, MetaConstants.CITY, MetaConstants.LABEL));
+                metaList.Add(_metaPivotService.AddMeta(_model.StateName, MetaConstants.STATE, MetaConstants.STATE, MetaConstants.LABEL));
+                metaList.Add(_metaPivotService.AddMeta(_model.PostalCode, MetaConstants.POSTAL_CODE, MetaConstants.POSTAL_CODE, MetaConstants.LABEL));
                 var response = await _metaPivotService.SaveMetaAsync(metaList);
                 _model.SetActivityResource();
                 if (response == HttpConstants.SUCCESS)
+                {
                     _model.UserMeta = null;
+                    await Navigation.PopAsync();
+                }
+
                 _model.SetActivityResource(showError: true,
                     errorMessage: response == HttpConstants.SUCCESS
                         ? TextResources.MessageUserDetailSaveSuccessful
@@ -88,6 +83,7 @@ namespace com.organo.x4ever.Pages.Profile
         private bool Validate()
         {
             ValidationErrors validationErrors = new ValidationErrors();
+
             if (string.IsNullOrEmpty(_model.CountryName))
                 validationErrors.Add(string.Format(TextResources.Required_IsMandatory, TextResources.Country));
             if (string.IsNullOrEmpty(_model.Address))
@@ -111,9 +107,20 @@ namespace com.organo.x4ever.Pages.Profile
         {
             await UpdateProfileAsync();
         }
+        
+        public void Dispose()
+        {
+            if (!isDispose)
+            {
+                isDispose = true;
+                GC.SuppressFinalize(this);
+            }
+        }
+
+        private bool isDispose = false;
     }
 
-    public abstract class ProfileSettingXaml : ModelBoundContentPage<SettingsViewModel>
+    public abstract class ProfileSettingXaml : ModelBoundContentPage<ProfileSettingViewModel>
     {
     }
 }

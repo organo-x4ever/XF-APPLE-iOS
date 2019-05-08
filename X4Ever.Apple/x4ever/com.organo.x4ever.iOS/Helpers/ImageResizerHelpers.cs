@@ -288,13 +288,16 @@ namespace com.organo.x4ever.ios
 
         public async Task<byte[]> ImageToBytesAsync(ImageSize imageSize)
         {
-            byte[] imageData = null;
-            FileInfo fileInfo = new FileInfo(imageSize.ImageName);
-            long imageFileLength = fileInfo.Length;
-            FileStream fs = new FileStream(imageSize.ImageName, FileMode.Open, FileAccess.Read);
-            BinaryReader br = new BinaryReader(fs);
-            imageData = br.ReadBytes((int)imageFileLength);
-            return imageData;
+            return await Task.Factory.StartNew(() =>
+            {
+                byte[] imageData = null;
+                FileInfo fileInfo = new FileInfo(imageSize.ImageName);
+                long imageFileLength = fileInfo.Length;
+                FileStream fs = new FileStream(imageSize.ImageName, FileMode.Open, FileAccess.Read);
+                BinaryReader br = new BinaryReader(fs);
+                imageData = br.ReadBytes((int) imageFileLength);
+                return imageData;
+            });
         }
     }
 }

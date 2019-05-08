@@ -183,7 +183,7 @@ namespace com.organo.x4ever.Services
                 var buffer = Encoding.UTF8.GetBytes(myContent);
                 var byteContent = new ByteArrayContent(buffer);
                 byteContent.Headers.ContentType = new MediaTypeHeaderValue(HttpConstants.MEDIA_TYPE_APPLICATION_JSON);
-                byteContent.Headers.Add(App.Configuration?.AppConfig.AcceptedTokenName, App.CurrentUser?.AccessToken);
+                byteContent.Headers.Add(App.Configuration?.AppConfig.AcceptedTokenName, App.Configuration.UserToken);
                 return await PostAsync(GetRequestUri(controller, method), byteContent);
             }
             catch (Exception exception)
@@ -263,35 +263,15 @@ namespace com.organo.x4ever.Services
             return null;
         }
 
-        ///// <summary>
-        ///// Gets Post header.
-        ///// </summary>
-        ///// <param name="data">
-        ///// Object to post data
-        ///// </param>
-        ///// <returns>
-        ///// returns Headers for Post request
-        ///// </returns>
-        //private static ByteArrayContent DataHeaderAsync(object data)
-        //{
-        //    var myContent = JsonConvert.SerializeObject(data);
-        //    var buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
-        //    var byteContent = new ByteArrayContent(buffer);
-        //    byteContent.Headers.ContentType = new MediaTypeHeaderValue(HttpConstants.MEDIA_TYPE_APPLICATION_JSON);
-        //    if (App.Configuration != null && App.CurrentUser != null)
-        //        byteContent.Headers.Add(App.Configuration?.AppConfig.AcceptedTokenName, App.CurrentUser?.AccessToken);
-        //    return byteContent;
-        //}
-
         private static HttpRequestMessage CheckHeaders(HttpRequestMessage request)
         {
-            if (App.Configuration != null && App.CurrentUser != null)
+            if (App.Configuration != null)
             {
                 if (!request.Headers.Contains(App.Configuration?.AppConfig.AcceptedTokenName))
                 {
-                    if (App.CurrentUser != null && !string.IsNullOrEmpty(App.CurrentUser?.AccessToken))
+                    if (!string.IsNullOrEmpty(App.Configuration.UserToken))
                         request.Headers.Add(App.Configuration?.AppConfig.AcceptedTokenName,
-                            App.CurrentUser?.AccessToken);
+                            App.Configuration.UserToken);
                 }
 
                 if (!request.Headers.Contains(App.Configuration?.AppConfig.ApplicationRequestHeader))
@@ -321,13 +301,13 @@ namespace com.organo.x4ever.Services
 
         private static HttpContent CheckHeaders(HttpContent request)
         {
-            if (App.Configuration != null && App.CurrentUser != null)
+            if (App.Configuration != null)
             {
                 if (!request.Headers.Contains(App.Configuration?.AppConfig.AcceptedTokenName))
                 {
-                    if (App.CurrentUser != null && !string.IsNullOrEmpty(App.CurrentUser?.AccessToken))
+                    if (!string.IsNullOrEmpty(App.Configuration.UserToken))
                         request.Headers.Add(App.Configuration?.AppConfig.AcceptedTokenName,
-                            App.CurrentUser?.AccessToken);
+                            App.Configuration.UserToken);
                 }
 
                 if (!request.Headers.Contains(App.Configuration?.AppConfig.ApplicationRequestHeader))
@@ -348,7 +328,7 @@ namespace com.organo.x4ever.Services
             if (!request.Headers.Contains(HttpConstants.PLATFORM))
             {
                 var platform = DeviceInfo.GetPlatform;
-                if (!string.IsNullOrEmpty(platform))
+                if (platform != null)
                     request.Headers.Add(HttpConstants.PLATFORM, platform);
             }
 
@@ -378,23 +358,7 @@ namespace com.organo.x4ever.Services
             }
             catch (Exception)
             {
-                //try
-                //{
-                //    DependencyService.Get<IInformationMessageServices>().LongAlert(TextResources.GotError);
-                //    var methodWithParam = "postdebuglog?debugLogstring=" + GetExceptionDetail(ex);
-                //    var request = new HttpRequestMessage()
-                //    {
-                //        RequestUri = new Uri(GetRequestUri("logs", methodWithParam)),
-                //        Method = HttpMethod.Post,
-                //    };
-                //    request.Headers.Accept.Add(
-                //        new MediaTypeWithQualityHeaderValue(HttpConstants.MEDIA_TYPE_TEXT_PLAIN));
-                //    await HttpClient.SendAsync(request);
-                //}
-                //catch (Exception)
-                //{
-                //    //
-                //}
+                DependencyService.Get<IInformationMessageServices>().LongAlert("Network Failure Error");
             }
         }
 
@@ -404,10 +368,7 @@ namespace com.organo.x4ever.Services
             try
             {
                 WriteDebugger(message, messageDetail);
-                var token = App.CurrentUser != null && App.CurrentUser.AccessToken != null &&
-                            App.CurrentUser.AccessToken.Trim().Length > 0
-                    ? App.CurrentUser.AccessToken
-                    : "";
+                var token = App.Configuration.UserToken;
                 var deviceDetail = "";
                 try
                 {

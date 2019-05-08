@@ -4,38 +4,43 @@ using com.organo.x4ever.Models.Validation;
 using com.organo.x4ever.Pages.Base;
 using com.organo.x4ever.Services;
 using com.organo.x4ever.Statics;
+using com.organo.x4ever.ViewModels.ChangePassword;
 using com.organo.x4ever.ViewModels.Profile;
 using System;
 using System.Threading.Tasks;
-
+using com.organo.x4ever.Handler;
 using Xamarin.Forms;
 
 namespace com.organo.x4ever.Pages.ChangePassword
 {
     public partial class ChangePasswordPage : ChangePasswordPageXaml
     {
-        private readonly SettingsViewModel _model;
+        private readonly ChangePasswordViewModel _model;
         private readonly IUserPivotService _userPivotService;
         private readonly IHelper _helper;
 
-        public ChangePasswordPage(RootPage root, SettingsViewModel model)
+        public ChangePasswordPage()
         {
-            InitializeComponent();
-            App.Configuration.Initial(this);
-            _model = model;
-            _model.Root = root;
-            BindingContext = _model;
-            Init();
-            _userPivotService = DependencyService.Get<IUserPivotService>();
-            _helper = DependencyService.Get<IHelper>();
-            _model.SetActivityResource();
-            _model.CurrentPassword = string.Empty;
-            _model.NewPassword = string.Empty;
-            _model.ConfirmNewPassword = string.Empty;
+            try
+            {
+                InitializeComponent();
+                _model = new ChangePasswordViewModel();
+                _userPivotService = DependencyService.Get<IUserPivotService>();
+                _helper = DependencyService.Get<IHelper>();
+                Init();
+            }
+            catch (Exception ex)
+            {
+                new ExceptionHandler(typeof(ChangePasswordPage).FullName, ex);
+            }
         }
 
-        public sealed override void Init(object obj = null)
-        {
+        public sealed override async void Init(object obj = null)
+        { 
+            await App.Configuration.InitialAsync(this);
+            NavigationPage.SetHasNavigationBar(this, true);
+            BindingContext = _model;
+            _model.SetActivityResource();
             buttonSubmit.Clicked += async (sender, e) => { await RequestChangeAsync(); };
         }
 
@@ -49,14 +54,14 @@ namespace com.organo.x4ever.Pages.ChangePassword
             _model.SetActivityResource(false, true);
             if (Validate())
             {
-                var response =
-                    await _userPivotService.ChangePasswordAsync(_model.CurrentPassword.Trim(),
-                        _model.NewPassword.Trim());
+                var response = await _userPivotService.ChangePasswordAsync(_model.CurrentPassword.Trim(), _model.NewPassword.Trim());
                 if (response != null && response.Contains(HttpConstants.SUCCESS))
                 {
                     _model.CurrentPassword = string.Empty;
                     _model.NewPassword = string.Empty;
                     _model.ConfirmNewPassword = string.Empty;
+                    
+                    await Navigation.PopAsync();
                 }
 
                 _model.SetActivityResource(showError: true, errorMessage: response.Contains(HttpConstants.SUCCESS)
@@ -92,7 +97,7 @@ namespace com.organo.x4ever.Pages.ChangePassword
         }
     }
 
-    public abstract class ChangePasswordPageXaml : ModelBoundContentPage<SettingsViewModel>
+    public abstract class ChangePasswordPageXaml : ModelBoundContentPage<ChangePasswordViewModel>
     {
     }
 }

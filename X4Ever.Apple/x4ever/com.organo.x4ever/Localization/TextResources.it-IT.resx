@@ -1836,4 +1836,25 @@
   <data name="YoutubeVideoDescriptionNoAvail" xml:space="preserve">
     <value>Description does not found on YouTube for this video.</value>
   </data>
+  <data name="Notifications" xml:space="preserve">
+    <value>notifiche</value>
+  </data>
+  <data name="Notification_GeneralMessage" xml:space="preserve">
+    <value>Messaggio generale</value>
+  </data>
+  <data name="Notification_Intimation" xml:space="preserve">
+    <value>intimazione</value>
+  </data>
+  <data name="Notification_Promotional" xml:space="preserve">
+    <value>promozionale</value>
+  </data>
+  <data name="Notification_SpecialOffer" xml:space="preserve">
+    <value>Offerta speciale</value>
+  </data>
+  <data name="Notification_VersionUpdate" xml:space="preserve">
+    <value>Aggiornamento della versione</value>
+  </data>
+  <data name="Notification_WeightSubmitReminder" xml:space="preserve">
+    <value>Peso Invia</value>
+  </data>
 </root>

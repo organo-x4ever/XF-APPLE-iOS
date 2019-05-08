@@ -54,8 +54,33 @@ namespace com.organo.x4ever.ViewModels.Menu
                 width = iconSize.Width;
             }
             
+            //var menuItems = await DependencyService.Get<IMenuServices>().GetByApplicationAsync();
+            //MenuItems = (from m in menuItems
+            //    select new HomeMenuItem
+            //    {
+            //        MenuTitle = _helper.GetResource(m.MenuTitle),
+            //        MenuType = (MenuType) Enum.Parse(typeof(MenuType), m.MenuType),
+            //        MenuIcon = m.MenuIcon != null ? _helper.GetResource(m.MenuIcon) : "",
+            //        IconStyle = IconStyle,
+            //        IconSource = m.MenuIcon != null
+            //            ? ImageResizer.ResizeImage(_helper.GetResource(m.MenuIcon), iconSize)
+            //            : null,
+            //        IconHeight = height,
+            //        IconWidth = width,
+            //        IsIconVisible = m.MenuIconVisible,
+            //        TextStyle = (MenuType) Enum.Parse(typeof(MenuType), m.MenuType) == MenuType.MyProfile
+            //            ? SelectedStyle
+            //            : DefaultStyle,
+            //        IsSelected = (MenuType) Enum.Parse(typeof(MenuType), m.MenuType) == MenuType.MyProfile,
+            //        ItemPadding = new Thickness(15, 7, 0, 7)
+            //    }).ToList();
+
+            
             var menuItems = await DependencyService.Get<IMenuServices>().GetByApplicationAsync();
+            App.Configuration.IsProfileEditAllowed = menuItems.Any(m =>
+                ((MenuType) Enum.Parse(typeof(MenuType), m.MenuType) == MenuType.Settings));
             MenuItems = (from m in menuItems
+                where !((MenuType) Enum.Parse(typeof(MenuType), m.MenuType) == MenuType.Settings)
                 select new HomeMenuItem
                 {
                     MenuTitle = _helper.GetResource(m.MenuTitle),
@@ -72,7 +97,8 @@ namespace com.organo.x4ever.ViewModels.Menu
                         ? SelectedStyle
                         : DefaultStyle,
                     IsSelected = (MenuType) Enum.Parse(typeof(MenuType), m.MenuType) == MenuType.MyProfile,
-                    ItemPadding = new Thickness(15, 7, 0, 7)
+                    ItemPadding = new Thickness(15, 5, 0, 5),
+                    IsVisible = !((MenuType) Enum.Parse(typeof(MenuType), m.MenuType) == MenuType.Settings)
                 }).ToList();
         }
         

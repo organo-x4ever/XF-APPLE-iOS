@@ -42,7 +42,7 @@ namespace com.organo.x4ever.ViewModels.Account
             var response = await DependencyService.Get<IUserSettingService>().UpdateUserLanguageAsync(requestModel);
             if (response == HttpConstants.SUCCESS)
             {
-                await App.Configuration.SetUserLanguage(requestModel.LanguageCode);
+                await App.Configuration.SetUserLanguageAsync(requestModel.LanguageCode);
                 App.GoToAccountPage();
             }
         }

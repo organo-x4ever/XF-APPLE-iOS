@@ -23,7 +23,7 @@ namespace com.organo.x4ever.ios.Renderers
         /// <summary>
         /// Used for registration with dependency service
         /// </summary>
-        public static void Init()
+        public new static void Init()
         {
             var temp = DateTime.Now;
         }

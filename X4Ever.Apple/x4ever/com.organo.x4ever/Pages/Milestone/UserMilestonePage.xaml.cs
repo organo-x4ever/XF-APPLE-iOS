@@ -21,7 +21,7 @@ namespace com.organo.x4ever.Pages.Milestone
         private readonly IMedia _media;
         private readonly PoundToKiligramConverter _converter = new PoundToKiligramConverter();
 
-        public UserMilestonePage(RootPage root, MyProfileViewModel profileViewModel)
+        public UserMilestonePage(RootPage root, ProfileEnhancedViewModel profileViewModel)
         {
             try
             {
@@ -93,17 +93,6 @@ namespace com.organo.x4ever.Pages.Milestone
                         Command = new Command(async (e) => { await UploadImageAsync(ImageSide.SIDE); })
                     };
                     imageSide.GestureRecognizers.Add(tapImageSide);
-
-                    //    _model.ViewComponents.Add(sliderCurrentWeight);
-                    //    _model.ViewComponents.Add(imageFront);
-                    //    _model.ViewComponents.Add(imageSide);
-                    //    _model.ViewComponents.Add(ImageMale);
-                    //    _model.ViewComponents.Add(LabelMale);
-                    //    _model.ViewComponents.Add(ImageFemale);
-                    //    _model.ViewComponents.Add(LabelFemale);
-                    //    _model.ViewComponents.Add(entryTShirtSize);
-                    //    _model.ViewComponents.Add(pickerTShirtSize);
-                    //    _model.ViewComponents.Add(entryAboutJourney);
                 });
             }
             catch (Exception ex)
@@ -180,10 +169,10 @@ namespace com.organo.x4ever.Pages.Milestone
                 }
 
                 if (!string.IsNullOrEmpty(localMessage))
-                    _model.SetActivityResource(showError: true,
-                        errorMessage: localMessage);
+                    _model.SetActivityResource(showError: true, errorMessage: localMessage);
             });
-            await Task.Delay(1);
+            
+            await Task.Delay(TimeSpan.FromMilliseconds(1));
         }
     }
 
