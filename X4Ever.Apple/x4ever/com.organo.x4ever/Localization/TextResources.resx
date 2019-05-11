@@ -1862,4 +1862,7 @@ your 3rd meal. Enjoy Pro Meals
   <data name="Notification_WeightSubmitReminder" xml:space="preserve">
     <value>Weight Submit</value>
   </data>
+  <data name="SortBy" xml:space="preserve">
+    <value>Sort By</value>
+  </data>
 </root>

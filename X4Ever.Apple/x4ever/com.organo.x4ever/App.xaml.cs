@@ -65,6 +65,7 @@ namespace com.organo.x4ever
 
         public static void GoToAccountPage(bool loggedIn = false)
         {
+            //CurrentApp.MainPage = new Pages.Media.AudioPlayerPage();
             if (loggedIn)
                 CurrentApp.MainPage = new RootPage();
             else

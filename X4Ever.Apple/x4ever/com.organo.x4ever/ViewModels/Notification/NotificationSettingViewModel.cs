@@ -29,6 +29,11 @@ namespace com.organo.x4ever.ViewModels.Notification
             VersionUpdateText = TextResources.Notification_VersionUpdate;
             GeneralMessageText = TextResources.Notification_GeneralMessage;
             NotificationsText = TextResources.Notifications;
+            IsGeneralMessageText = SetBoolToString();
+            IsPromotionalText = SetBoolToString();
+            IsSpecialOfferText = SetBoolToString();
+            IsVersionUpdateText = SetBoolToString();
+            IsWeightSubmitReminderText = SetBoolToString();
             GetNotificationStatus();
         }
 
@@ -111,52 +116,7 @@ namespace com.organo.x4ever.ViewModels.Notification
         }
 
         public Action CreateAllEventAction { get; set; }
-
-        private string _weightSubmitReminderText;
-        public const string WeightSubmitReminderTextPropertyName = "WeightSubmitReminderText";
-
-        public string WeightSubmitReminderText
-        {
-            get => _weightSubmitReminderText;
-            set => SetProperty(ref _weightSubmitReminderText, value, WeightSubmitReminderTextPropertyName);
-        }
-
-        private string _promotionalText;
-        public const string PromotionalTextPropertyName = "PromotionalText";
-
-        public string PromotionalText
-        {
-            get => _promotionalText;
-            set => SetProperty(ref _promotionalText, value, PromotionalTextPropertyName);
-        }
-
-        private string _specialOfferText;
-        public const string SpecialOfferTextPropertyName = "SpecialOfferText";
-
-        public string SpecialOfferText
-        {
-            get => _specialOfferText;
-            set => SetProperty(ref _specialOfferText, value, SpecialOfferTextPropertyName);
-        }
-
-        private string _versionUpdateText;
-        public const string VersionUpdateTextPropertyName = "VersionUpdateText";
-
-        public string VersionUpdateText
-        {
-            get => _versionUpdateText;
-            set => SetProperty(ref _versionUpdateText, value, VersionUpdateTextPropertyName);
-        }
-
-        private string _generalMessageText;
-        public const string GeneralMessageTextPropertyName = "GeneralMessageText ";
-
-        public string GeneralMessageText
-        {
-            get => _generalMessageText;
-            set => SetProperty(ref _generalMessageText, value, GeneralMessageTextPropertyName);
-        }
-
+        
         private string _notificationsText;
         public const string NotificationsTextPropertyName = "NotificationsText ";
 
@@ -165,7 +125,17 @@ namespace com.organo.x4ever.ViewModels.Notification
             get => _notificationsText;
             set => SetProperty(ref _notificationsText, value, NotificationsTextPropertyName);
         }
+        
+        /* WEIGHT SUBMIT REMINDER NOTIFICATION */
+        private string _weightSubmitReminderText;
+        public const string WeightSubmitReminderTextPropertyName = "WeightSubmitReminderText";
 
+        public string WeightSubmitReminderText
+        {
+            get => _weightSubmitReminderText;
+            set => SetProperty(ref _weightSubmitReminderText, value, WeightSubmitReminderTextPropertyName);
+        }
+        
         private bool _isWeightSubmitReminder;
         public const string IsWeightSubmitReminderPropertyName = "IsWeightSubmitReminder";
 
@@ -175,7 +145,26 @@ namespace com.organo.x4ever.ViewModels.Notification
             set => SetProperty(ref _isWeightSubmitReminder, value, IsWeightSubmitReminderPropertyName,
                 SwitchWeightSubmitReminderLabelStyleChange);
         }
+        
+        private string _isWeightSubmitReminderText;
+        public const string IsWeightSubmitReminderTextPropertyName = "IsWeightSubmitReminderText";
 
+        public string IsWeightSubmitReminderText
+        {
+            get => _isWeightSubmitReminderText;
+            set => SetProperty(ref _isWeightSubmitReminderText, value, IsWeightSubmitReminderTextPropertyName);
+        }
+
+        /* PROMOTTIONAL NOTIFICATION */
+        private string _promotionalText;
+        public const string PromotionalTextPropertyName = "PromotionalText";
+
+        public string PromotionalText
+        {
+            get => _promotionalText;
+            set => SetProperty(ref _promotionalText, value, PromotionalTextPropertyName);
+        }
+        
         private bool _isPromotional;
         public const string IsPromotionalPropertyName = "IsPromotional";
 
@@ -184,7 +173,26 @@ namespace com.organo.x4ever.ViewModels.Notification
             get => _isPromotional;
             set => SetProperty(ref _isPromotional, value, IsPromotionalPropertyName, SwitchPromotionalLabelStyleChange);
         }
+        
+        private string _isPromotionalText;
+        public const string IsPromotionalTextPropertyName = "IsPromotionalText";
 
+        public string IsPromotionalText
+        {
+            get => _isPromotionalText;
+            set => SetProperty(ref _isPromotionalText, value, IsPromotionalTextPropertyName);
+        }
+
+        /* SPECIAL OFFER NOTIFICATION */
+        private string _specialOfferText;
+        public const string SpecialOfferTextPropertyName = "SpecialOfferText";
+
+        public string SpecialOfferText
+        {
+            get => _specialOfferText;
+            set => SetProperty(ref _specialOfferText, value, SpecialOfferTextPropertyName);
+        }
+        
         private bool _isSpecialOffer;
         public const string IsSpecialOfferPropertyName = "IsSpecialOffer";
 
@@ -194,7 +202,26 @@ namespace com.organo.x4ever.ViewModels.Notification
             set => SetProperty(ref _isSpecialOffer, value, IsSpecialOfferPropertyName,
                 SwitchSpecialOfferLabelStyleChange);
         }
+        
+        private string _isSpecialOfferText;
+        public const string IsSpecialOfferTextPropertyName = "IsSpecialOfferText";
 
+        public string IsSpecialOfferText
+        {
+            get => _isSpecialOfferText;
+            set => SetProperty(ref _isSpecialOfferText, value, IsSpecialOfferTextPropertyName);
+        }
+
+        /* VERSION UPDATE NOTIFICATION */
+        private string _versionUpdateText;
+        public const string VersionUpdateTextPropertyName = "VersionUpdateText";
+
+        public string VersionUpdateText
+        {
+            get => _versionUpdateText;
+            set => SetProperty(ref _versionUpdateText, value, VersionUpdateTextPropertyName);
+        }
+        
         private bool _isVersionUpdate;
         public const string IsVersionUpdatePropertyName = "IsVersionUpdate";
 
@@ -203,6 +230,25 @@ namespace com.organo.x4ever.ViewModels.Notification
             get => _isVersionUpdate;
             set => SetProperty(ref _isVersionUpdate, value, IsVersionUpdatePropertyName,
                 SwitchVersionUpdateLabelStyleChange);
+        }
+        
+        private string _isVersionUpdateText;
+        public const string IsVersionUpdateTextPropertyName = "IsVersionUpdateText";
+
+        public string IsVersionUpdateText
+        {
+            get => _isVersionUpdateText;
+            set => SetProperty(ref _isVersionUpdateText, value, IsVersionUpdateTextPropertyName);
+        }
+
+        /* GENERAL MESSAGE NOTIFICATION */
+        private string _generalMessageText;
+        public const string GeneralMessageTextPropertyName = "GeneralMessageText ";
+
+        public string GeneralMessageText
+        {
+            get => _generalMessageText;
+            set => SetProperty(ref _generalMessageText, value, GeneralMessageTextPropertyName);
         }
 
         public bool _isGeneralMessage;
@@ -214,44 +260,7 @@ namespace com.organo.x4ever.ViewModels.Notification
             set => SetProperty(ref _isGeneralMessage, value, IsGeneralMessagePropertyName,
                 SwitchGeneralMessageLabelStyleChange);
         }
-
         
-        private string _isWeightSubmitReminderText;
-        public const string IsWeightSubmitReminderTextPropertyName = "IsWeightSubmitReminderText";
-
-        public string IsWeightSubmitReminderText
-        {
-            get => _isWeightSubmitReminderText;
-            set => SetProperty(ref _isWeightSubmitReminderText, value, IsWeightSubmitReminderTextPropertyName);
-        }
-
-        private string _isPromotionalText;
-        public const string IsPromotionalTextPropertyName = "IsPromotionalText";
-
-        public string IsPromotionalText
-        {
-            get => _isPromotionalText;
-            set => SetProperty(ref _isPromotionalText, value, IsPromotionalTextPropertyName);
-        }
-
-        private string _isSpecialOfferText;
-        public const string IsSpecialOfferTextPropertyName = "IsSpecialOfferText";
-
-        public string IsSpecialOfferText
-        {
-            get => _isSpecialOfferText;
-            set => SetProperty(ref _isSpecialOfferText, value, IsSpecialOfferTextPropertyName);
-        }
-
-        private string _isVersionUpdateText;
-        public const string IsVersionUpdateTextPropertyName = "IsVersionUpdateText";
-
-        public string IsVersionUpdateText
-        {
-            get => _isVersionUpdateText;
-            set => SetProperty(ref _isVersionUpdateText, value, IsVersionUpdateTextPropertyName);
-        }
-
         public string _isGeneralMessageText;
         public const string IsGeneralMessageTextPropertyName = "IsGeneralMessageText";
 
@@ -261,6 +270,7 @@ namespace com.organo.x4ever.ViewModels.Notification
             set => SetProperty(ref _isGeneralMessageText, value, IsGeneralMessageTextPropertyName);
         }
 
+        // STYLE CHANGE FUNCTION
         private void SwitchSpecialOfferLabelStyleChange()
         {
             SwitchSpecialOfferLabelStyle = IsSpecialOffer
@@ -305,13 +315,16 @@ namespace com.organo.x4ever.ViewModels.Notification
 
             IsGeneralMessageText = SetBoolToString(IsGeneralMessage);
         }
-
-        private string SetBoolToString(bool isTrue)
+        
+        // UPDATE ENABLE/DISABLE TEXT FUNCTION
+        private string SetBoolToString(bool isTrue = false)
         {
             return new BoolToStringConverter()
                 .ConvertToString(isTrue, null, "enabledisable", App.Configuration.LanguageInfo).ToString();
         }
 
+        
+        // STYLE PROPERTIES
         private Style _switchSpecialOfferLabelStyle;
         public const string SwitchSpecialOfferLabelStylePropertyName = "SwitchSpecialOfferLabelStyle";
 

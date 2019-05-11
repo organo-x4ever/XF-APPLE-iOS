@@ -1,499 +1,380 @@
-﻿using com.organo.xchallenge.Localization;
-using com.organo.xchallenge.Pages;
-using com.organo.xchallenge.Permissions;
-using com.organo.xchallenge.Services;
-using com.organo.xchallenge.Statics;
-using com.organo.xchallenge.ViewModels.Base;
+﻿using com.organo.x4ever.Helpers;
+using com.organo.x4ever.Localization;
+using com.organo.x4ever.MediaManager;
+using com.organo.x4ever.Models;
+using com.organo.x4ever.Statics;
+using com.organo.x4ever.ViewModels.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using com.organo.xchallenge.Globals;
-using com.organo.xchallenge.Helpers;
-using Plugin.MediaManager;
-using Plugin.MediaManager.Abstractions;
-using Plugin.MediaManager.Abstractions.Enums;
-using Plugin.MediaManager.Abstractions.Implementations;
+using com.organo.x4ever.Handler;
 using Xamarin.Forms;
 
-namespace com.organo.xchallenge.ViewModels.Media
+namespace com.organo.x4ever.ViewModels.Media
 {
     public class AudioPlayerViewModel : BaseViewModel
     {
-        private readonly ILocalFile _localFile;
-        private IDevicePermissionServices _devicePermissionServices;
-        
+        private IAudioPlayerManager _audioPlayerManager;
+        private readonly IMusicDictionary _musicDictionary;
+        private static short timerSeconds = 1;
+
         public AudioPlayerViewModel(INavigation navigation = null) : base(navigation)
         {
-            this.SetPageImageSize();
-            this.PlayButton = TextResources.icon_media_play;
-            this.PauseButton = TextResources.icon_media_pause;
-            this.StopButton = TextResources.icon_media_stop;
-            this.NextButton = TextResources.icon_media_next;
-            this.PreviousButton = TextResources.icon_media_previous;
-            this.PlayPauseButton = this.PlayButton;
-            this.IsPaused = false;
-            this.IsPlaying = false;
-            this.MediaContents = new List<MediaFile>();
-            this.CurrentSongIndex = -1;
-            this._localFile = DependencyService.Get<ILocalFile>();
-            _devicePermissionServices = DependencyService.Get<IDevicePermissionServices>();
-            CrossMediaManager.Current.AudioPlayer.StatusChanged += AudioPlayer_StatusChanged;
-            //CrossMediaManager.Current.AudioPlayer.OnFinishedPlaying = () =>
-            //{
-            //    //this.IsStopped = true;
-            //    //this.PlayPauseButton = this.PlayButton;
-            //    this.NextCommand();
-            //};
-            this.IsStopped = true;
-            this.IsEditable = false;
+            _audioPlayerManager = DependencyService.Get<IAudioPlayerManager>();
+            _musicDictionary = DependencyService.Get<IMusicDictionary>();
+            SetPageImageSize();
+            MusicFiles = new List<MediaItem>();
+            AllMusicFiles = new List<MediaItem>();
+            PlaylistMusicFiles = new List<MediaItem>();
+            CurrentMusicFile = new MediaItem();
+            PlayButton = ImageResizer.ResizeImage(TextResources.icon_media_play, ButtonImageSize);
+            PauseButton = ImageResizer.ResizeImage(TextResources.icon_media_pause, ButtonImageSize);
+            StopButton = ImageResizer.ResizeImage(TextResources.icon_media_stop, ButtonImageSize);
+            NextButton = ImageResizer.ResizeImage(TextResources.icon_media_next, ButtonImageSize);
+            PreviousButton = ImageResizer.ResizeImage(TextResources.icon_media_previous, ButtonImageSize);
+            //ForwardButton = ImageResizer.ResizeImage(TextResources.icon_media_forward, ButtonImageSize);
+            //BackwardButton = ImageResizer.ResizeImage(TextResources.icon_media_backward, ButtonImageSize);
+            PlayPauseButton = PlayButton;
+            NowPlayingButton = PlayButton;
+
+            ChecklistImage = ChecklistDefaultImage;
+            SortImage = SortDefaultImage;
+            PlaylistTextStyle = PlaylistTextStyleDefault;
+            PlaylistSortBy = PlaylistSortList.Title;
+
+            IsPlaying = false;
+            IsPause = false;
+            IsMediaExists = false;
+            CurrentSongIndex = 0;
+            IsLoopStarted = false;
+            IsPermissionGranted = false;
         }
 
-        private void AudioPlayer_StatusChanged(object sender, Plugin.MediaManager.Abstractions.EventArguments.StatusChangedEventArgs e)
+        private void CurrentPlay()
         {
-            this.IsStopped = true;
-            //this.PlayPauseButton = this.PlayButton;
-            this.NextCommand();
-        }
-
-        public async Task GetAsync()
-        {
-            if (await _devicePermissionServices.RequestReadStoragePermission())
+            if (IsLoopStarted) return;
+            var seconds = TimeSpan.FromSeconds(timerSeconds);
+            Device.StartTimer(seconds, () =>
             {
-                this.MediaContents = new List<MediaFile>();
-                var mediaContents = new List<MediaFile>();
-                var fileDetails = await _localFile.UpdatePlayListAsync();
-                if (fileDetails == null || fileDetails.Count == 0 && !fileDetails.Any(f => f.Type.EndsWith(FileType)))
-                    this.SetActivityResource(true, false, false, true, string.Empty, string.Empty,
-                        TextResources.NoFileOrPermission);
-                else
+                IsLoopStarted = true;
+                PlayerLoop().GetAwaiter();
+                return IsLoopStarted;
+            });
+        }
+
+        private async Task PlayerLoop()
+        {
+            if (IsPlaying)
+            {
+                CurrentPosition = (_audioPlayerManager.CurrentPlayer.CurrentPosition * 100) /
+                                  _audioPlayerManager.CurrentPlayer.Duration;
+                CurrentTimer = TimeSpan.FromSeconds(_audioPlayerManager.CurrentPlayer.CurrentPosition)
+                    .ToString(TimeStyle);
+                double TOLERANCE = _audioPlayerManager.CurrentPlayer.Duration;
+                if (_audioPlayerManager.CurrentPlayer.IsPlaying && _audioPlayerManager.CurrentPlayer.CurrentPosition >=
+                    _audioPlayerManager.CurrentPlayer.Duration)
+                    await PlayCurrent(Next());
+            }
+        }
+
+        public async void OnLoad() => await GetFilesAsync();
+
+        public async Task GetFilesAsync()
+        {
+            MusicFiles = new List<MediaItem>();
+            AllMusicFiles = new List<MediaItem>();
+
+            Messages = new List<Message>();
+            try
+            {
+                IsPermissionGranted = _musicDictionary.MediaLibraryAuthorized;
+                await Task.Factory.StartNew(() =>
                 {
-                    int count = 0;
-                    foreach (var content in fileDetails?.Where(f => f.Type.EndsWith(FileType)).OrderBy(f => f.Name))
-                    {
-                        count++;
-                        mediaContents.Add(new MediaFile()
-                        {
-                            Url = content.Path,
-                            Type = MediaFileType.Audio,
-                            MetadataExtracted = false,
-                            Availability = ResourceAvailability.Remote,
-                        });
-                    }
+                    _musicDictionary.Messages = new List<string>();
+                    var musicFiles = _musicDictionary.GetSongs();
 
-                    this.MediaContents = mediaContents;
-                    CrossMediaManager.Current.MediaQueue.Repeat = RepeatType.RepeatOne;
-                    await CrossMediaManager.Current.Play(this.MediaContents);
-                    this.IsEditable = this.MediaContents.Count > 0;
-                    if (!this.IsEditable)
+                    AllMusicFiles = musicFiles.Select(music =>
                     {
-                        this.MessageText = TextResources.NoRecordToProcess;
-                        this.IsMessage = true;
-                    }
+                        music._Duration = music.Duration;
+                        music._DurationTimeSpan = music.Duration.ToString().Split('.')[0];
+                        return music;
+                    }).OrderBy(m => m.Title).ToList();
 
-                    this.PlaySong();
-                    this.ErrorMessage = string.Empty;
-                    this.IsError = false;
-                }
+                    IsMediaExists = AllMusicFiles.Count > 0;
+                    IsSongsExist = !IsMediaExists;
+                    MusicFiles = AllMusicFiles;
+                    SortOrderBy(PlaylistSortBy);
+                    if (MusicFiles.Count == 0)
+                        SetActivityResource(showError: true, errorMessage: TextResources.NoFileExists);
+                });
             }
-            else
+            catch (Exception ex)
             {
-                this.ErrorMessage = TextResources.MessagePermissionReadStorageRequired;
-                this.IsError = true;
+                SetActivityResource(showError: true, errorMessage: "Exception occurred");
+                new ExceptionHandler(nameof(AudioPlayerViewModel), ex);
             }
         }
 
-        private string FileType => "MP3";
+        private List<Message> _messages;
+        public const string MessagesPropertyName = "Messages";
 
-        private RootPage root;
-        public const string RootPropertyName = "Root";
-
-        public RootPage Root
+        public List<Message> Messages
         {
-            get { return root; }
-            set { SetProperty(ref root, value, RootPropertyName); }
+            get => _messages;
+            set => SetProperty(ref _messages, value, MessagesPropertyName);
         }
 
-        private string _playPauseButton;
-        public string PlayPauseButtonPropertyName = "PlayPauseButton";
-
-        public string PlayPauseButton
+        public class Message
         {
-            get { return _playPauseButton; }
-            set { SetProperty(ref _playPauseButton, value, PlayPauseButtonPropertyName, ChangePlayPauseButton); }
+            public string Text { get; set; }
+        }
+        
+        private bool _isSongsExist;
+        public const string IsSongsExistPropertyName = "IsSongsExist";
+
+        public bool IsSongsExist
+        {
+            get { return _isSongsExist; }
+            set { SetProperty(ref _isSongsExist, value, IsSongsExistPropertyName); }
         }
 
-        private void ChangePlayPauseButton()
+        private bool IsLoopStarted { get; set; }
+        private bool IsDurationLong { get; set; }
+        private string TimeStyle { get; set; }
+
+        private bool _isPermissionGranted;
+        public const string IsPermissionGrantedPropertyName = "IsPermissionGranted";
+
+        public bool IsPermissionGranted
         {
-            this.PlayPauseButtonSource = ImageResizer.ResizeImage(this.PlayPauseButton, this.ButtonImageSize);
+            get { return _isPermissionGranted; }
+            set { SetProperty(ref _isPermissionGranted, value, IsPermissionGrantedPropertyName); }
         }
 
-        private ImageSource _playPauseButtonSource;
-        public string PlayPauseButtonSourcePropertyName = "PlayPauseButtonSource";
+        private double _currentPosition;
+        public const string CurrentPositionPropertyName = "CurrentPosition";
 
-        public ImageSource PlayPauseButtonSource
+        public double CurrentPosition
         {
-            get { return _playPauseButtonSource; }
-            set { SetProperty(ref _playPauseButtonSource, value, PlayPauseButtonSourcePropertyName); }
+            get { return _currentPosition; }
+            set { SetProperty(ref _currentPosition, value, CurrentPositionPropertyName); }
         }
 
-        private string _playButton;
+        private string _currentTimer;
+        public const string CurrentTimerPropertyName = "CurrentTimer";
+
+        public string CurrentTimer
+        {
+            get { return _currentTimer; }
+            set { SetProperty(ref _currentTimer, value, CurrentTimerPropertyName); }
+        }
+
+
+        private string _timeSplitor;
+        public const string TimeSplitorPropertyName = "TimeSplitor";
+
+        public string TimeSplitor
+        {
+            get { return _timeSplitor; }
+            set { SetProperty(ref _timeSplitor, value, TimeSplitorPropertyName); }
+        }
+
+        private string _totalTimer;
+        public const string TotalTimerPropertyName = "TotalTimer";
+
+        public string TotalTimer
+        {
+            get { return _totalTimer; }
+            set { SetProperty(ref _totalTimer, value, TotalTimerPropertyName); }
+        }
+
+        private string _mediaTitle;
+        public const string MediaTitlePropertyName = "MediaTitle";
+
+        public string MediaTitle
+        {
+            get { return _mediaTitle; }
+            set { SetProperty(ref _mediaTitle, value, MediaTitlePropertyName); }
+        }
+
+        private ImageSource _playButton;
         public string PlayButtonPropertyName = "PlayButton";
 
-        public string PlayButton
+        public ImageSource PlayButton
         {
             get { return _playButton; }
-            set { SetProperty(ref _playButton, value, PlayButtonPropertyName, ChangePlayButton); }
+            set { SetProperty(ref _playButton, value, PlayButtonPropertyName); }
         }
 
-        private void ChangePlayButton()
-        {
-            this.PlayButtonSource = ImageResizer.ResizeImage(this.PlayButton, this.ButtonImageSize);
-        }
-
-        private ImageSource _playButtonSource;
-        public string PlayButtonSourcePropertyName = "PlayButtonSource";
-
-        public ImageSource PlayButtonSource
-        {
-            get { return _playButtonSource; }
-            set { SetProperty(ref _playButtonSource, value, PlayButtonSourcePropertyName); }
-        }
-
-        private string _pauseButton;
+        private ImageSource _pauseButton;
         public string PauseButtonPropertyName = "PauseButton";
 
-        public string PauseButton
+        public ImageSource PauseButton
         {
             get { return _pauseButton; }
-            set { SetProperty(ref _pauseButton, value, PauseButtonPropertyName, ChangePauseButton); }
+            set { SetProperty(ref _pauseButton, value, PauseButtonPropertyName); }
         }
-        
-        private void ChangePauseButton()
+
+        private ImageSource _playPauseButton;
+        public string PlayPauseButtonPropertyName = "PlayPauseButton";
+
+        public ImageSource PlayPauseButton
         {
-            this.PauseButtonSource = ImageResizer.ResizeImage(this.PauseButton, this.ButtonImageSize);
+            get { return _playPauseButton; }
+            set { SetProperty(ref _playPauseButton, value, PlayPauseButtonPropertyName); }
         }
 
-        private ImageSource _pauseButtonSource;
-        public string PauseButtonSourcePropertyName = "PauseButtonSource";
-
-        public ImageSource PauseButtonSource
-        {
-            get { return _pauseButtonSource; }
-            set { SetProperty(ref _pauseButtonSource, value, PauseButtonSourcePropertyName); }
-        }
-
-        private string _stopButton;
+        private ImageSource _stopButton;
         public string StopButtonPropertyName = "StopButton";
 
-        public string StopButton
+        public ImageSource StopButton
         {
             get { return _stopButton; }
-            set { SetProperty(ref _stopButton, value, StopButtonPropertyName, ChangeStopButton); }
+            set { SetProperty(ref _stopButton, value, StopButtonPropertyName); }
         }
 
-        private void ChangeStopButton()
+        private ImageSource _forwardButton;
+        public string ForwardButtonPropertyName = "ForwardButton";
+
+        public ImageSource ForwardButton
         {
-            this.StopButtonSource = ImageResizer.ResizeImage(this.StopButton, this.ButtonImageSize);
+            get { return _forwardButton; }
+            set { SetProperty(ref _forwardButton, value, ForwardButtonPropertyName); }
         }
 
-        private ImageSource _stopButtonSource;
-        public string StopButtonSourcePropertyName = "StopButtonSource";
+        private ImageSource _backwardButton;
+        public string BackwardButtonPropertyName = "BackwardButton";
 
-        public ImageSource StopButtonSource
+        public ImageSource BackwardButton
         {
-            get { return _stopButtonSource; }
-            set { SetProperty(ref _stopButtonSource, value, StopButtonSourcePropertyName); }
+            get { return _backwardButton; }
+            set { SetProperty(ref _backwardButton, value, BackwardButtonPropertyName); }
         }
 
-        private string _nextButton;
+        private ImageSource _nextButton;
         public string NextButtonPropertyName = "NextButton";
 
-        public string NextButton
+        public ImageSource NextButton
         {
             get { return _nextButton; }
-            set { SetProperty(ref _nextButton, value, NextButtonPropertyName, ChangeNextButton); }
-        }
-        
-        private void ChangeNextButton()
-        {
-            this.NextButtonSource = ImageResizer.ResizeImage(this.NextButton, this.ButtonImageSize);
+            set { SetProperty(ref _nextButton, value, NextButtonPropertyName); }
         }
 
-        private ImageSource _nextButtonSource;
-        public string NextButtonSourcePropertyName = "NextButtonSource";
-
-        public ImageSource NextButtonSource
-        {
-            get { return _nextButtonSource; }
-            set { SetProperty(ref _nextButtonSource, value, NextButtonSourcePropertyName); }
-        }
-
-        private string _previousButton;
+        private ImageSource _previousButton;
         public string PreviousButtonPropertyName = "PreviousButton";
 
-        public string PreviousButton
+        public ImageSource PreviousButton
         {
             get { return _previousButton; }
-            set { SetProperty(ref _previousButton, value, PreviousButtonPropertyName, ChangePreviousButton); }
+            set { SetProperty(ref _previousButton, value, PreviousButtonPropertyName); }
         }
 
-        private void ChangePreviousButton()
+        private ImageSource _nowPlayingButton;
+        public string NowPlayingButtonPropertyName = "NowPlayingButton";
+
+        public ImageSource NowPlayingButton
         {
-            this.PreviousButtonSource = ImageResizer.ResizeImage(this.PreviousButton, this.ButtonImageSize);
+            get { return _nowPlayingButton; }
+            set { SetProperty(ref _nowPlayingButton, value, NowPlayingButtonPropertyName); }
         }
 
-        private ImageSource _previousButtonSource;
-        public string PreviousButtonSourcePropertyName = "PreviousButtonSource";
+        private bool _isChecklistSelected;
+        public const string IsChecklistSelectedPropertyName = "IsChecklistSelected";
 
-        public ImageSource PreviousButtonSource
+        public bool IsChecklistSelected
         {
-            get { return _previousButtonSource; }
-            set { SetProperty(ref _previousButtonSource, value, PreviousButtonSourcePropertyName); }
+            get => _isChecklistSelected;
+            set => SetProperty(ref _isChecklistSelected, value, IsChecklistSelectedPropertyName);
         }
 
-        public int Duration => (int)CrossMediaManager.Current.AudioPlayer.Duration.TotalSeconds;
-        public int CurrentPosition => CrossMediaManager.Current.AudioPlayer.Position.Seconds;
-        public bool CanSeek => true;
+        public ImageSource ChecklistSelectedImage =>
+            ImageResizer.ResizeImage(ImageConstants.ICON_CHECK_LIST_24x24, 24, 24);
 
-        private float _volume;
-        public const string VolumePropertyName = "Volume";
+        public ImageSource ChecklistDefaultImage =>
+            ImageResizer.ResizeImage(ImageConstants.ICON_CHECK_LIST_LIGHT_24x24, 24, 24);
 
-        public float Volume
+        private ImageSource _checklistImage;
+        public const string ChecklistImagePropertyName = "ChecklistImage";
+
+        public ImageSource ChecklistImage
         {
-            get { return _volume; }
-            set { SetProperty(ref _volume, value, VolumePropertyName, SetVolume); }
+            get => _checklistImage;
+            set => SetProperty(ref _checklistImage, value, ChecklistImagePropertyName);
         }
 
-        private bool _isStopped;
-        private string IsStoppedPropertyName => "IsStopped";
+        public ImageSource SortSelectedImage => ImageResizer.ResizeImage(ImageConstants.ICON_SORT_24x24, 24, 24);
+        public ImageSource SortDefaultImage => ImageResizer.ResizeImage(ImageConstants.ICON_SORT_LIGHT_24x24, 24, 24);
 
-        public bool IsStopped
+        private ImageSource _sortImage;
+        public const string SortImagePropertyName = "SortImage";
+
+        public ImageSource SortImage
         {
-            get { return _isStopped; }
-            set { SetProperty(ref _isStopped, value, IsStoppedPropertyName, OnPlaying); }
+            get => _sortImage;
+            set => SetProperty(ref _sortImage, value, SortImagePropertyName);
         }
 
-        private bool _isPlaying;
-        public const string IsPlayingPropertyName = "IsPlaying";
+        private string _sortBy;
+        public const string SortByPropertyName = "SortBy";
 
-        public bool IsPlaying
+        public string SortBy
         {
-            get { return _isPlaying; }
-            set { SetProperty(ref _isPlaying, value, IsPlayingPropertyName); }
+            get => _sortBy;
+            set => SetProperty(ref _sortBy, value, SortByPropertyName);
         }
 
-        private bool _isPaused;
-        public string IsPausedPropertyName => "IsPaused";
+        private PlaylistSortList _playlistSortBy;
+        public const string PlaylistSortByPropertyName = "PlaylistSortBy";
 
-        public bool IsPaused
+        public PlaylistSortList PlaylistSortBy
         {
-            get { return _isPaused; }
-            set { SetProperty(ref _isPaused, value, IsPausedPropertyName, OnPlaying); }
+            get => _playlistSortBy;
+            set => SetProperty(ref _playlistSortBy, value, PlaylistSortByPropertyName);
         }
 
-        private bool _showPlaying;
-        private string ShowPlayingPropertyName => "ShowPlaying";
+        private Style _playlistTextStyle;
+        public const string PlaylistTextStylePropertyName = "PlaylistTextStyle";
 
-        public bool ShowPlaying
+        public Style PlaylistTextStyle
         {
-            get { return _showPlaying; }
-            set { SetProperty(ref _showPlaying, value, ShowPlayingPropertyName); }
+            get => _playlistTextStyle;
+            set => SetProperty(ref _playlistTextStyle, value, PlaylistTextStylePropertyName);
         }
 
-        private void OnPlaying()
-        {
-            this.IsStopped = CrossMediaManager.Current.AudioPlayer.Status == MediaPlayerStatus.Stopped;
-            this.ShowPlaying = !this.IsStopped;
-            this.IsPlaying  = CrossMediaManager.Current.AudioPlayer.Status == MediaPlayerStatus.Playing;
-            TimerDisplaying?.Invoke();
-            if (this.IsStopped)
-                this.ProgressTime = "00:00";
-        }
+        public Style PlaylistTextStyleDefault => (Style) App.CurrentApp.Resources["labelStyleInfoCheck"];
+        public Style PlaylistTextStyleSelected => (Style) App.CurrentApp.Resources["labelStyleInfoCheckHighlight"];
 
-        public void PlayPauseCommand()
+        private ImageSize ButtonImageSize { get; set; }
+
+        private void SetPageImageSize()
         {
-            if (this.IsStopped)
-                this.ProgressTime = "00:00";
-            if (this.MediaContents.Count == 0)
-                return;
-            if (this.MediaContentCurrent == null)
-                this.MediaContentCurrent = this.MediaContents[0];
-            this.PlayPauseButton = this.PlayPauseButton == this.PlayButton ? this.PauseButton : this.PlayButton;
-            if (this.PlayPauseButton == this.PauseButton)
+            ButtonImageSize = App.Configuration.GetImageSizeByID(ImageIdentity.AUDIO_PLAYER_PAGE_COMMAND_IMAGE);
+            if (ButtonImageSize != null)
             {
-                if (this.IsStopped)
-                {
-                    this.IsStopped = false;
-                    CrossMediaManager.Current.AudioPlayer.Play(this.MediaContentCurrent);
-                }
-                else
-                {
-                    CrossMediaManager.Current.AudioPlayer.Play();
-                }
-
-                this.IsPaused = false;
-            }
-            else
-            {
-                this.IsPaused = true;
-                CrossMediaManager.Current.AudioPlayer.Pause();
+                AudioCommandImageHeight = ButtonImageSize.Height - 5;
+                AudioCommandImageWidth = ButtonImageSize.Width - 5;
             }
         }
 
-        public Action TimerDisplaying { get; set; }
+        private float _audioCommandImageHeight;
+        public const string AudioCommandImageHeightPropertyName = "AudioCommandImageHeight";
 
-        public void Stop()
+        public float AudioCommandImageHeight
         {
-            this.IsStopped = true;
-            this.ProgressTime = "00:00";
-            CrossMediaManager.Current.AudioPlayer.Stop();
-            this.PlayPauseButton = this.PlayButton;
-            var mediaContents = this.MediaContents;
-            this.MediaContents = new List<MediaFile>();
-            foreach (var mediaContent in mediaContents)
-            {
-                //mediaContent.IsPlayingNow = false;
-                //mediaContent.MediaTitleColor = Palette._TitleTexts;
-                this.MediaContents.Add(mediaContent);
-            }
+            get { return _audioCommandImageHeight; }
+            set { SetProperty(ref _audioCommandImageHeight, value, AudioCommandImageHeightPropertyName); }
         }
 
-        public void NextCommand()
+        private float _audioCommandImageWidth;
+        public const string AudioCommandImageWidthPropertyName = "AudioCommandImageWidth";
+
+        public float AudioCommandImageWidth
         {
-            this.IsPaused = false;
-            this.CurrentSongIndex += 1;
-            if (this.IsPlaying)
-            {
-                CrossMediaManager.Current.AudioPlayer.Play(this.MediaContentCurrent);
-                this.PlayPauseButton = this.PauseButton;
-            }
-        }
-
-        public void PreviousCommand()
-        {
-            this.IsPaused = false;
-            this.CurrentSongIndex -= 1;
-            if (this.IsPlaying)
-            {
-                CrossMediaManager.Current.AudioPlayer.Play(this.MediaContentCurrent);
-                this.PlayPauseButton = this.PauseButton;
-            }
-        }
-
-        public void IndexedCommand(int index)
-        {
-            this.IsStopped = false;
-            this.IsPaused = false;
-            this.CurrentSongIndex = index;
-            CrossMediaManager.Current.AudioPlayer.Play(this.MediaContentCurrent);
-            this.PlayPauseButton = this.PauseButton;
-        }
-
-        public void PlaySong()
-        {
-            this.ProgressTime = "00:00";
-            if (this.MediaContents.Count > 0)
-            {
-                if (this.CurrentSongIndex < 0)
-                    this.CurrentSongIndex = this.MediaContents.Count - 1;
-                else if (this.CurrentSongIndex > (this.MediaContents.Count - 1))
-                    this.CurrentSongIndex = 0;
-                this.MediaContentCurrent = this.MediaContents[this.CurrentSongIndex];
-                UpdateMediaContents(this.MediaContentCurrent, this.CurrentSongIndex);
-            }
-        }
-
-        public void UpdateMediaContents(MediaFile mediaContentCurrent, int rowToUpdateIndex = 100000)
-        {
-            var mediaContents = this.MediaContents;
-            if (rowToUpdateIndex == 100000)
-                rowToUpdateIndex = this.MediaContents.FindIndex(m =>
-                    m == mediaContentCurrent && m == mediaContentCurrent);
-            this.MediaContents = new List<MediaFile>();
-            int index = 0;
-            foreach (var mediaContent in mediaContents)
-            {
-                //mediaContent.IsPlayingNow = index == this.CurrentSongIndex;
-                if (index == rowToUpdateIndex)
-                {
-                    //mediaContentCurrent.IsPlayingNow = index == this.CurrentSongIndex;
-                    this.MediaContents.Add(mediaContentCurrent);
-                }
-                else
-                    this.MediaContents.Add(mediaContent);
-
-                //mediaContent.MediaTitleColor = mediaContent.IsPlayingNow ? Palette._MainAccent : Palette._TitleTexts;
-                index += 1;
-            }
-        }
-
-        private void SetVolume()
-        {
-            //CrossMediaManager.Current.AudioPlayer.SetVolume(this.Volume);
-        }
-
-        public void SeekTo(int seekValue)
-        {
-            CrossMediaManager.Current.AudioPlayer.Seek(new TimeSpan(seekValue));
-        }
-
-        public string ConvertTImeToDisplay(int milliseconds)
-        {
-            var times = TimeSpan.FromMilliseconds(milliseconds).ToString().Split('.');
-            string[] timeStrings = times[0].ToString().Split(':');
-            int.TryParse(timeStrings[0], out int h);
-            return (h > 0 ? h.ToString() + ":" : "") + timeStrings[1] + ":" + timeStrings[2];
-        }
-
-        private ICommand _showSideMenuCommand;
-
-        public ICommand ShowSideMenuCommand
-        {
-            get
-            {
-                return _showSideMenuCommand ?? (_showSideMenuCommand = new Command((obj) =>
-                {
-                    this.Root.IsPresented = this.Root.IsPresented == false;
-                }));
-            }
-        }
-
-        private string _progressTime;
-        public string ProgressTimePropertyName => "ProgressTime";
-
-        public string ProgressTime
-        {
-            get { return _progressTime; }
-            set { SetProperty(ref _progressTime, value, ProgressTimePropertyName); }
-        }
-
-        private string _totalTime;
-        public string TotalTimePropertyName => "TotalTime";
-
-        public string TotalTime
-        {
-            get { return _totalTime; }
-            set { SetProperty(ref _totalTime, value, TotalTimePropertyName); }
-        }
-
-        private List<MediaFile> _mediaContents;
-        public const string MediaContentsPropertyName = "MediaContents";
-
-        public List<Plugin.MediaManager.Abstractions.Implementations.MediaFile> MediaContents
-        {
-            get { return _mediaContents; }
-            set { SetProperty(ref _mediaContents, value, MediaContentsPropertyName); }
-        }
-
-        private MediaFile _mediaContentCurrent;
-        public const string MediaContentCurrentPropertyName = "MediaContentCurrent";
-
-        public MediaFile MediaContentCurrent
-        {
-            get { return _mediaContentCurrent; }
-            set { SetProperty(ref _mediaContentCurrent, value, MediaContentCurrentPropertyName); }
+            get { return _audioCommandImageWidth; }
+            set { SetProperty(ref _audioCommandImageWidth, value, AudioCommandImageWidthPropertyName); }
         }
 
         private int _currentSongIndex;
@@ -502,36 +383,352 @@ namespace com.organo.xchallenge.ViewModels.Media
         public int CurrentSongIndex
         {
             get { return _currentSongIndex; }
-            set { SetProperty(ref _currentSongIndex, value, CurrentSongIndexPropertyName, PlaySong); }
+            set { SetProperty(ref _currentSongIndex, value, CurrentSongIndexPropertyName); }
         }
 
-        private ImageSize ButtonImageSize { get; set; }
-        private void SetPageImageSize()
+        private bool _isMediaExists;
+        public const string IsMediaExistsPropertyName = "IsMediaExists";
+
+        public bool IsMediaExists
         {
-            this.ButtonImageSize = App.Configuration.GetImageSizeByID(ImageIdentity.AUDIO_PLAYER_PAGE_COMMAND_IMAGE);
-            if (this.ButtonImageSize != null)
+            get { return _isMediaExists; }
+            set { SetProperty(ref _isMediaExists, value, IsMediaExistsPropertyName); }
+        }
+
+        private bool _isPlaying;
+        public const string IsPlayingPropertyName = "IsPlaying";
+
+        public bool IsPlaying
+        {
+            get { return _isPlaying; }
+            set { SetProperty(ref _isPlaying, value, IsPlayingPropertyName, IsPlayingChange); }
+        }
+
+        private void IsPlayingChange()
+        {
+            if (IsPlaying)
+                PlayPauseButton = PauseButton;
+            else
+                PlayPauseButton = PlayButton;
+        }
+
+        private bool _isPause;
+        public const string IsPausePropertyName = "IsPause";
+
+        public bool IsPause
+        {
+            get { return _isPause; }
+            set { SetProperty(ref _isPause, value, IsPausePropertyName); }
+        }
+
+        public async Task PlayCurrent(int songIndex)
+        {
+            try
             {
-                this.AudioCommandImageHeight = this.ButtonImageSize.Height;
-                this.AudioCommandImageWidth = this.ButtonImageSize.Width;
+                await Task.Run(() =>
+                {
+                    CurrentSongIndex = songIndex;
+                    IsPlaying = true;
+                    MusicFiles = MusicFiles.Select(m =>
+                    {
+                        m.IsPlayNow = false;
+                        m.TextColor = Palette._LightGrayD;
+                        return m;
+                    }).ToList();
+
+                    var currentMusicFile = MusicFiles[songIndex];
+                    currentMusicFile.IsPlayNow = true;
+                    currentMusicFile.TextColor = Palette._MainAccent;
+                    CurrentMusicFile = currentMusicFile;
+                    MediaTitle = MusicFiles[songIndex].Title;
+                    _audioPlayerManager.CurrentPlayer.PlaySong(CurrentMusicFile);
+                    IsDurationLong = _audioPlayerManager.CurrentPlayer.Duration > (60 * 60);
+                    TimeStyle = IsDurationLong ? @"hh\:mm\:ss" : @"mm\:ss";
+                    TotalTimer = TimeSpan.FromSeconds(_audioPlayerManager.CurrentPlayer.Duration).ToString(TimeStyle);
+                    CurrentPlay();
+                });
+            }
+            catch (Exception ex)
+            {
+                //Error
+                _ = ex;
             }
         }
 
-        private float audioCommandImageHeight;
-        public const string AudioCommandImageHeightPropertyName = "AudioCommandImageHeight";
-
-        public float AudioCommandImageHeight
+        private int Next()
         {
-            get { return audioCommandImageHeight; }
-            set { SetProperty(ref audioCommandImageHeight, value, AudioCommandImageHeightPropertyName); }
+            if (MusicFiles.Count() > (CurrentSongIndex + 1))
+                CurrentSongIndex++;
+            else
+                CurrentSongIndex = 0;
+            return CurrentSongIndex;
         }
 
-        private float audioCommandImageWidth;
-        public const string AudioCommandImageWidthPropertyName = "AudioCommandImageWidth";
-
-        public float AudioCommandImageWidth
+        private int Previous()
         {
-            get { return audioCommandImageWidth; }
-            set { SetProperty(ref audioCommandImageWidth, value, AudioCommandImageWidthPropertyName); }
+            if (CurrentSongIndex > 0)
+                CurrentSongIndex--;
+            else
+                CurrentSongIndex = MusicFiles.Count - 1;
+            return CurrentSongIndex;
         }
+
+        public List<MediaItem> AllMusicFiles { get; set; }
+        public List<MediaItem> PlaylistMusicFiles { get; set; }
+
+        private List<MediaItem> _musicFiles;
+        public const string MusicFilesPropertyName = "MusicFiles";
+
+        public List<MediaItem> MusicFiles
+        {
+            get { return _musicFiles; }
+            set { SetProperty(ref _musicFiles, value, MusicFilesPropertyName); }
+        }
+
+        private MediaItem _currentMusicFile;
+        public const string CurrentMusicFilePropertyName = "CurrentMusicFile";
+
+        public MediaItem CurrentMusicFile
+        {
+            get { return _currentMusicFile; }
+            set { SetProperty(ref _currentMusicFile, value, CurrentMusicFilePropertyName); }
+        }
+
+        private ICommand _playCommand;
+
+        public ICommand PlayCommand
+        {
+            get
+            {
+                return _playCommand ?? (_playCommand = new Command(async (obj) =>
+                {
+                    IsPlaying = IsPlaying == false;
+                    if (IsPlaying)
+                    {
+                        if (IsPause)
+                            _audioPlayerManager.CurrentPlayer.Play();
+                        //else
+                        //    await PlayCurrent(CurrentSongIndex);
+                        IsPause = false;
+                    }
+                    else
+                    {
+                        IsPause = true;
+                        _audioPlayerManager.CurrentPlayer.Pause();
+                    }
+                }));
+            }
+        }
+
+        private ICommand _stopCommand;
+
+        public ICommand StopCommand
+        {
+            get
+            {
+                return _stopCommand ?? (_stopCommand = new Command(() =>
+                {
+                    IsPlaying = false;
+                    StopAsync();
+                    CurrentTimer = TimeSpan.FromSeconds(0).ToString(TimeStyle);
+                    TimeSplitor = "";
+                }));
+            }
+        }
+
+        public void StopAsync()
+        {
+            try
+            {
+                IsLoopStarted = false;
+                CurrentPosition = 0;
+                _audioPlayerManager.CurrentPlayer.Pause();
+            }
+            catch
+            {
+                // Commented
+            }
+        }
+
+        private ICommand _nextCommand;
+
+        public ICommand NextCommand
+        {
+            get
+            {
+                return _nextCommand ?? (_nextCommand = new Command(async () =>
+                {
+                    await PlayCurrent(Next());
+                }));
+            }
+        }
+
+        private ICommand _previousCommand;
+
+        public ICommand PreviousCommand
+        {
+            get
+            {
+                return _previousCommand ?? (_previousCommand = new Command(async () =>
+                {
+                    await PlayCurrent(Previous());
+                }));
+            }
+        }
+
+        //private ICommand _forwardCommand;
+
+        //public ICommand ForwardCommand
+        //{
+        //    get
+        //    {
+        //        return _forwardCommand ?? (_forwardCommand = new Command(async () =>
+        //        {
+        //            if (_audioPlayerManager.CurrentPlayer.Duration >
+        //                _audioPlayerManager.CurrentPlayer.CurrentPosition + 10)
+        //                _audioPlayerManager.CurrentPlayer.Seek(_audioPlayerManager.CurrentPlayer.CurrentPosition + 10);
+        //            else
+        //                await PlayCurrent(Next());
+        //        }));
+        //    }
+        //}
+
+        //private ICommand _backwardCommand;
+
+        //public ICommand BackwardCommand
+        //{
+        //    get
+        //    {
+        //        return _backwardCommand ?? (_backwardCommand = new Command(() =>
+        //        {
+        //            if (_audioPlayerManager.CurrentPlayer.CurrentPosition - 10 > 0)
+        //                _audioPlayerManager.CurrentPlayer.Seek(_audioPlayerManager.CurrentPlayer.CurrentPosition - 10);
+        //            else
+        //                _audioPlayerManager.CurrentPlayer.Seek(0);
+        //        }));
+        //    }
+        //}
+
+        private ICommand _checklistImageCommand;
+
+        public ICommand ChecklistImageCommand => _checklistImageCommand ?? (_checklistImageCommand = new Command(() =>
+        {
+            IsChecklistSelected = !IsChecklistSelected;
+            if (IsChecklistSelected)
+            {
+                ChecklistImage = ChecklistSelectedImage;
+                PlaylistTextStyle = PlaylistTextStyleSelected;
+                MusicFiles = new List<MediaItem>();
+                MusicFiles = AllMusicFiles.Select(m =>
+                {
+                    m.IsPlayNow = false;
+                    m.IsPlaylistSelected = PlaylistMusicFiles.Any(t =>
+                        t.AlbumPersistentID == m.AlbumPersistentID && t.SongID == m.SongID &&
+                        t.Title == m.Title && t.Album == m.Album && t.Artist == m.Artist);
+                    m.TextColor = m.IsPlaylistSelected ? Palette._LightGrayD : Palette._ButtonBackgroundGray;
+                    return m;
+                }).ToList();
+            }
+            else
+            {
+                ChecklistImage = ChecklistDefaultImage;
+                PlaylistTextStyle = PlaylistTextStyleDefault;
+                MusicFiles = new List<MediaItem>();
+                if (PlaylistMusicFiles.Count > 0)
+                    MusicFiles = PlaylistMusicFiles;
+                else
+                    MusicFiles = AllMusicFiles.Select(m =>
+                    {
+                        m.IsPlayNow = false;
+                        m.IsPlaylistSelected = true;
+                        m.TextColor = m.IsPlaylistSelected ? Palette._LightGrayD : Palette._ButtonBackgroundGray;
+                        return m;
+                    }).ToList();
+            }
+        }));
+
+        public Action DisplaySortByListAction { get; set; }
+        public SortDirection SortDirect { get; set; }
+        private ICommand _sortCommand;
+
+        public ICommand SortCommand =>
+            _sortCommand ?? (_sortCommand = new Command(() => { DisplaySortByListAction?.Invoke(); }));
+
+        public void SortOrderBy(PlaylistSortList sort)
+        {
+            switch (sort)
+            {
+                case PlaylistSortList.Album:
+                    if (SortBy != PlaylistSortList.Album.ToString() || SortDirect != SortDirection.Asc)
+                    {
+                        MusicFiles = MusicFiles.OrderBy(m => m.Album).ToList();
+                        SortDirect = SortDirection.Asc;
+                    }
+                    else
+                    {
+                        SortDirect = SortDirection.Desc;
+                        MusicFiles = MusicFiles.OrderByDescending(m => m.Album).ToList();
+                    }
+
+                    SortBy = PlaylistSortList.Album.ToString();
+                    break;
+                case PlaylistSortList.Artist:
+                    if (SortBy != PlaylistSortList.Artist.ToString() || SortDirect != SortDirection.Asc)
+                    {
+                        MusicFiles = MusicFiles.OrderBy(m => m.Artist).ToList();
+                        SortDirect = SortDirection.Asc;
+                    }
+                    else
+                    {
+                        SortDirect = SortDirection.Desc;
+                        MusicFiles = MusicFiles.OrderByDescending(m => m.Artist).ToList();
+                    }
+
+                    SortBy = PlaylistSortList.Artist.ToString();
+                    break;
+                case PlaylistSortList.Duration:
+                    if (SortBy != PlaylistSortList.Duration.ToString() || SortDirect != SortDirection.Asc)
+                    {
+                        MusicFiles = MusicFiles.OrderBy(m => m.Duration).ToList();
+                        SortDirect = SortDirection.Asc;
+                    }
+                    else
+                    {
+                        SortDirect = SortDirection.Desc;
+                        MusicFiles = MusicFiles.OrderByDescending(m => m.Duration).ToList();
+                    }
+
+                    SortBy = PlaylistSortList.Duration.ToString();
+                    break;
+                default:
+                    if (SortBy != PlaylistSortList.Title.ToString() || SortDirect != SortDirection.Asc)
+                    {
+                        MusicFiles = MusicFiles.OrderBy(m => m.Title).ToList();
+                        SortDirect = SortDirection.Asc;
+                    }
+                    else
+                    {
+                        SortDirect = SortDirection.Desc;
+                        MusicFiles = MusicFiles.OrderByDescending(m => m.Title).ToList();
+                    }
+
+                    SortBy = PlaylistSortList.Title.ToString();
+                    break;
+            }
+        }
+    }
+
+    public enum PlaylistSortList
+    {
+        Title,
+        Album,
+        Artist,
+        Duration
+    }
+
+    public enum SortDirection
+    {
+        Asc,
+        Desc
     }
 }

@@ -47,7 +47,7 @@ namespace com.organo.x4ever.Pages.Profile
                 var exceptionHandler = new ExceptionHandler(TAG, ex);
             }
         }
-        
+
         public async override void Init(object obj = null)
         {
             await App.Configuration.InitialAsync(this);
@@ -56,7 +56,7 @@ namespace com.organo.x4ever.Pages.Profile
             _model.GetPageData();
             await VersionCheck();
 
-            await Task.Delay(TimeSpan.FromMilliseconds(2));
+            //await Task.Delay(TimeSpan.FromMilliseconds(2));
             UserSettingLayout();
         }
 

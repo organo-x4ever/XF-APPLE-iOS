@@ -1861,4 +1861,7 @@
   <data name="Notification_WeightSubmitReminder" xml:space="preserve">
     <value>Peso Enviar</value>
   </data>
+  <data name="SortBy" xml:space="preserve">
+    <value>Sort By</value>
+  </data>
 </root>

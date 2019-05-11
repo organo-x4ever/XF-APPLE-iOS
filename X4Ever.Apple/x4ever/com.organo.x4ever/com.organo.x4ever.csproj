@@ -105,6 +105,12 @@
     <Compile Include="Globals\Helper.cs" />
     <Compile Include="Globals\IAppConfiguration.cs" />
     <Compile Include="Globals\IHelper.cs" />
+    <Compile Include="MediaManager\IAudioPlayer.cs" />
+    <Compile Include="MediaManager\IAudioPlayerManager.cs" />
+    <Compile Include="MediaManager\IMusicDictionary.cs" />
+    <Compile Include="MediaManager\IMusicQuery.cs" />
+    <Compile Include="MediaManager\MediaItem.cs" />
+    <Compile Include="MediaManager\MusicFile.cs" />
     <Compile Include="Models\AppInfoModel.cs" />
     <Compile Include="Models\IImageSize.cs" />
     <Compile Include="Handler\ExceptionHandler.cs" />
@@ -164,6 +170,9 @@
     </Compile>
     <Compile Include="Pages\MainPage\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Media\AudioPlayerPage.xaml.cs">
+      <DependentUpon>AudioPlayerPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\MenuGridPage.xaml.cs">
       <DependentUpon>MenuGridPage.xaml</DependentUpon>
@@ -467,6 +476,7 @@
     <Compile Include="ViewModels\HowItWorks\HowItWorksViewModel.cs" />
     <Compile Include="ViewModels\Login\LoginViewModel.cs" />
     <Compile Include="ViewModels\MealPlan\MealPlanViewModel.cs" />
+    <Compile Include="ViewModels\Media\AudioPlayerViewModel.cs" />
     <Compile Include="ViewModels\Menu\MenuGridViewModel.cs" />
     <Compile Include="ViewModels\Menu\MenuPageViewModel.cs" />
     <Compile Include="ViewModels\Message\MessageViewModel.cs" />
@@ -970,6 +980,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pages\Notification\NotificationSettingPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pages\Media\AudioPlayerPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

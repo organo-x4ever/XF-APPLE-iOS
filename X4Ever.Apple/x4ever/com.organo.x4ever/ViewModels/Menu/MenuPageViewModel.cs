@@ -79,6 +79,7 @@ namespace com.organo.x4ever.ViewModels.Menu
             var menuItems = await DependencyService.Get<IMenuServices>().GetByApplicationAsync();
             App.Configuration.IsProfileEditAllowed = menuItems.Any(m =>
                 ((MenuType) Enum.Parse(typeof(MenuType), m.MenuType) == MenuType.Settings));
+
             MenuItems = (from m in menuItems
                 where !((MenuType) Enum.Parse(typeof(MenuType), m.MenuType) == MenuType.Settings)
                 select new HomeMenuItem

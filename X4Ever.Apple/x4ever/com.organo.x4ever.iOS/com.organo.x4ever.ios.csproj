@@ -147,6 +147,7 @@
   <ItemGroup>
     <Compile Include="Connection\InternetConnection.cs" />
     <Compile Include="Exception\UserAlertViewDelegate.cs" />
+    <Compile Include="Extensions\DateExtensions.cs" />
     <Compile Include="Globals\SetDeviceProperty.cs" />
     <Compile Include="Handler\VolumeButtonHandler.cs" />
     <Compile Include="Helpers\AppVersionProvider.cs" />
@@ -155,6 +156,17 @@
     <Compile Include="Localization\Localize.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="MediaManager\AudioPlayerManager.cs" />
+    <Compile Include="MediaManager\DetailViewController.cs" />
+    <Compile Include="MediaManager\DetailViewController.designer.cs" />
+    <Compile Include="MediaManager\AudioPlayerImplementation.cs" />
+    <Compile Include="MediaManager\MasterViewController.cs" />
+    <Compile Include="MediaManager\MasterViewController.designer.cs" />
+    <Compile Include="MediaManager\MusicDictionary.cs" />
+    <Compile Include="MediaManager\MusicQuery.cs" />
+    <Compile Include="MediaManager\MyMusicPlayer.cs" />
+    <Compile Include="MediaManager\Song.cs" />
+    <Compile Include="MediaManager\Songs.cs" />
     <Compile Include="Notification\NotificationServices.cs" />
     <Compile Include="Notification\UserNotificationCenterDelegate.cs" />
     <Compile Include="Permissions\DevicePermissionServices.cs" />

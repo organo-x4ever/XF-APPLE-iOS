@@ -2,10 +2,10 @@
 using com.organo.x4ever.Handler;
 using com.organo.x4ever.Localization;
 using com.organo.x4ever.Models;
-using com.organo.x4ever.Pages.Audio;
 using com.organo.x4ever.Pages.Community;
 using com.organo.x4ever.Pages.HowItWorks;
 using com.organo.x4ever.Pages.MealPlan;
+using com.organo.x4ever.Pages.Media;
 using com.organo.x4ever.Pages.News;
 using com.organo.x4ever.Pages.OGX;
 using com.organo.x4ever.Pages.Profile;
@@ -155,7 +155,7 @@ namespace com.organo.x4ever.Pages
                             break;
 
                         case MenuType.MyMusic:
-                            page = new XNavigationPage(new AudioManagerPage(this)
+                            page = new XNavigationPage(new AudioPlayerPage(this)
                             {
                                 Title = TextResources.MainTabs_MyMusic,
                                 Icon = new FileImageSource {File = TextResources.MainTabs_MyMusic_Icon}

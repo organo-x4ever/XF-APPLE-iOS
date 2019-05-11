@@ -1,105 +1,114 @@
-﻿
-using com.organo.xchallenge.Pages.Base;
-using com.organo.xchallenge.ViewModels.Media;
-using Plugin.MediaManager.Abstractions.Implementations;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using com.organo.x4ever.Handler;
+using com.organo.x4ever.Localization;
+using com.organo.x4ever.Pages.Base;
+using com.organo.x4ever.Statics;
+using com.organo.x4ever.Utilities;
+using com.organo.x4ever.ViewModels.Media;
 using Xamarin.Forms;
 
-namespace com.organo.xchallenge.Pages.Media
+namespace com.organo.x4ever.Pages.Media
 {
     public partial class AudioPlayerPage : AudioPlayerPageXaml
     {
         private AudioPlayerViewModel _model;
 
-        public AudioPlayerPage(RootPage root)
+        public AudioPlayerPage(RootPage rootPage)
         {
             try
             {
                 InitializeComponent();
-                this._model = new AudioPlayerViewModel();
-                this._model.Root = root;
-                this.Init();
+                Init(rootPage);
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                var msg = exception;
+                var exceptionHandler = new ExceptionHandler(TAG, ex);
             }
         }
 
-        public sealed override async void Init(object obj = null)
+        public override async void Init(object obj = null)
         {
             await App.Configuration.InitialAsync(this);
-            NavigationPage.SetHasNavigationBar(this, false);
-
-            this._model.TimerDisplaying = () => { Device.StartTimer(TimeSpan.FromSeconds(0.5), UpdatePosition); };
-            BindingContext = this._model;
-            await this._model.GetAsync();
-            this.InitControls();
-        }
-
-        private void InitControls()
-        {
-            SliderPosition.ValueChanged += SliderPostionValueChanged;
-
-            SliderPosition.Minimum = 0;
-            SliderPosition.IsEnabled = this._model.CanSeek;
-        }
-
-        private void SliderPostionValueChanged(object sender, ValueChangedEventArgs e)
-        {
-            if ((int) SliderPosition.Value != this._model.Duration)
-                this._model.SeekTo((int) SliderPosition.Value);
-        }
-
-        private bool UpdatePosition()
-        {
-            if (this._model.IsPlaying && this._model.Duration >= this._model.CurrentPosition)
+            _model = new AudioPlayerViewModel()
             {
-                this._model.ProgressTime = this._model.ConvertTImeToDisplay(this._model.CurrentPosition);
-                //var totalDuration = this._model.MediaContentCurrent.TotalDuration;
-                //if (totalDuration == null || totalDuration.Trim().Length == 0)
-                //{
-                //    this._model.MediaContentCurrent.TotalDuration =
-                //        this._model.ConvertTImeToDisplay(this._model.Duration);
-                //}
-                //this._model.TotalTime = this._model.MediaContentCurrent.TotalDuration;
-                SliderPosition.ValueChanged -= SliderPostionValueChanged;
-                SliderPosition.Value = this._model.CurrentPosition;
-                SliderPosition.ValueChanged += SliderPostionValueChanged;
-                SliderPosition.Maximum = this._model.Duration;
+                Root = (RootPage) obj,
+                DisplaySortByListAction = DisplaySortByList
+            };
+            BindingContext = _model;
+            await _model.GetFilesAsync();
+        }
+
+        private async void ListView_OnItemSelected(object sender, SelectedItemChangedEventArgs e)
+        {
+            if (e.SelectedItem != null)
+            {
+                if (_model.IsChecklistSelected)
+                {
+                    var musicFile = ((MediaItem) e.SelectedItem);
+                    musicFile.IsPlaylistSelected = true;
+                    musicFile.TextColor = musicFile.IsPlaylistSelected
+                        ? Palette._LightGrayD
+                        : Palette._ButtonBackgroundGray;
+
+                    var playlistMusicFile = _model.PlaylistMusicFiles.Find(m =>
+                        m.Title == musicFile.Title && m.Album == musicFile.Album && m.Artist == musicFile.Artist);
+                    if (playlistMusicFile == null)
+                        _model.PlaylistMusicFiles.Add(musicFile);
+                    else
+                        _model.PlaylistMusicFiles.Remove(playlistMusicFile);
+
+                    _model.MusicFiles = _model.MusicFiles.Select(m =>
+                    {
+                        m.IsPlaylistSelected = _model.PlaylistMusicFiles.Any(t =>
+                            t.AlbumPersistentID == m.AlbumPersistentID && t.SongID == m.SongID &&
+                            t.Title == m.Title && t.Album == m.Album && t.Artist == m.Artist);
+                        m.TextColor = m.IsPlaylistSelected ? Palette._LightGrayD : Palette._ButtonBackgroundGray;
+                        return m;
+                    }).ToList();
+                }
+                else if (!((MediaItem) e.SelectedItem).IsPlaylistSelected)
+                {
+                    _model.SetActivityResource(showMessage: true, message: "Song does not exist in playlist");
+                    return;
+                }
+                else if (_model.CurrentMusicFile != (MediaItem) e.SelectedItem)
+                {
+                    var selectedContent = (MediaItem) e.SelectedItem;
+                    _model.CurrentMusicFile = selectedContent;
+                    int index = _model.MusicFiles.FindIndex(m => m == selectedContent && m == selectedContent);
+                    await _model.PlayCurrent(index);
+                }
             }
 
-            return this._model.IsPlaying;
+            ListViewPlayer.SelectedItem = null;
         }
 
-        protected void PlayPauseClicked(Object sender, System.EventArgs e)
+        public async void DisplaySortByList()
         {
-            this._model.PlayPauseCommand();
+            var sortLists = EnumUtil.GetValues<PlaylistSortList>();
+            var list = new List<string>();
+            foreach (var sortList in sortLists)
+            {
+                list.Add(sortList.ToString());
+            }
+
+            var result =
+                await DisplayActionSheet(TextResources.SortBy, TextResources.Cancel, null, list.ToArray());
+            if (result != null && result != TextResources.Cancel)
+            {
+                _model.PlaylistSortBy = (PlaylistSortList) Enum.Parse(typeof(PlaylistSortList), result.ToString());
+                _model.SortOrderBy(_model.PlaylistSortBy);
+            }
         }
 
-        protected void PreviousClicked(Object sender, System.EventArgs e)
+        protected override void OnDisappearing()
         {
-            this._model.PreviousCommand();
+            _model?.StopAsync();
+            base.OnDisappearing();
         }
 
-        protected void NextClicked(Object sender, System.EventArgs e)
-        {
-            this._model.NextCommand();
-        }
-
-        protected void StopClicked(Object sender, System.EventArgs e)
-        {
-            SliderPosition.Value = SliderPosition.Minimum;
-            this._model.Stop();
-        }
-
-        private void ListView_OnItemSelected(object sender, SelectedItemChangedEventArgs e)
-        {
-            var selectedContent = (MediaFile) e.SelectedItem;
-            this._model.MediaContentCurrent = selectedContent;
-            int index = this._model.MediaContents.FindIndex(m => m == selectedContent && m == selectedContent);
-            this._model.IndexedCommand(index);
-        }
     }
 
     public abstract class AudioPlayerPageXaml : ModelBoundContentPage<AudioPlayerViewModel>
