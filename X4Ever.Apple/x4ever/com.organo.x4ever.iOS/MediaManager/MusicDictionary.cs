@@ -47,7 +47,8 @@ namespace com.organo.x4ever
                 {
                     if ((MPMediaLibraryAuthorizationStatus) status != MPMediaLibraryAuthorizationStatus.Authorized)
                     {
-                        Messages.Add("You must authorize the app to play music");
+                        Messages.Add(
+                            "You must authorize the X4Ever to play music. To allow go Settings -> X4Ever then enable Media & Apple Music");
                     }
                 });
             }
@@ -60,8 +61,6 @@ namespace com.organo.x4ever
             Dictionary<string, List<MediaItem>> albumSongs = new Dictionary<string, List<MediaItem>>();
             try
             {
-                if (!Authorized())
-                    return null;
                 MPMediaQuery mediaQuery = MPMediaQuery.AlbumsQuery;
                 MPMediaItemCollection[] songsByAlbum = mediaQuery.Collections;
                 List<MediaItem> songs;
@@ -112,8 +111,6 @@ namespace com.organo.x4ever
             List<MediaItem> songs = new List<MediaItem>();
             try
             {
-                if (!Authorized())
-                    return null;
                 MPMediaQuery mediaQuery = new MPMediaQuery();
                 MPMediaItem[] songItems = mediaQuery.Items;
                 foreach (var songItem in songItems)
@@ -145,8 +142,6 @@ namespace com.organo.x4ever
             Dictionary<string, List<MediaItem>> artistSongs = new Dictionary<string, List<MediaItem>>();
             try
             {
-                if (!Authorized())
-                    return null;
                 MusicQuery musicQuery = new MusicQuery();
                 var artistSongs1 = musicQuery.queryForSongs();
 

@@ -11,7 +11,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using com.organo.x4ever.Handler;
+using com.organo.x4ever.Services;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 namespace com.organo.x4ever.ViewModels.Media
 {
@@ -23,8 +25,15 @@ namespace com.organo.x4ever.ViewModels.Media
 
         public AudioPlayerViewModel(INavigation navigation = null) : base(navigation)
         {
+            SetActivityResource(showEditable: false, showBusy: true, busyMessage: TextResources.ProcessingPleaseWait);
             _audioPlayerManager = DependencyService.Get<IAudioPlayerManager>();
             _musicDictionary = DependencyService.Get<IMusicDictionary>();
+            if (!_musicDictionary.Authorized())
+            {
+                var message = "";
+                _musicDictionary.Messages.ForEach((msg) => { message += msg + "\n"; });
+                SetActivityResource(showMessage: true, message: message);
+            }
             SetPageImageSize();
             MusicFiles = new List<MediaItem>();
             AllMusicFiles = new List<MediaItem>();
@@ -67,15 +76,11 @@ namespace com.organo.x4ever.ViewModels.Media
 
         private async Task PlayerLoop()
         {
-            if (IsPlaying)
+            if (IsPlaying && CurrentPlayer.IsPlaying)
             {
-                CurrentPosition = (_audioPlayerManager.CurrentPlayer.CurrentPosition * 100) /
-                                  _audioPlayerManager.CurrentPlayer.Duration;
-                CurrentTimer = TimeSpan.FromSeconds(_audioPlayerManager.CurrentPlayer.CurrentPosition)
-                    .ToString(TimeStyle);
-                double TOLERANCE = _audioPlayerManager.CurrentPlayer.Duration;
-                if (_audioPlayerManager.CurrentPlayer.IsPlaying && _audioPlayerManager.CurrentPlayer.CurrentPosition >=
-                    _audioPlayerManager.CurrentPlayer.Duration)
+                CurrentPosition = (CurrentPlayer.CurrentPosition * 100) / CurrentMusicFile._Duration;
+                CurrentTimer = TimeSpan.FromSeconds(CurrentPlayer.CurrentPosition).ToString(TimeStyle);
+                if (CurrentPlayer.IsPlaying && CurrentPlayer.CurrentPosition >= CurrentMusicFile._Duration)
                     await PlayCurrent(Next());
             }
         }
@@ -86,36 +91,63 @@ namespace com.organo.x4ever.ViewModels.Media
         {
             MusicFiles = new List<MediaItem>();
             AllMusicFiles = new List<MediaItem>();
-
             Messages = new List<Message>();
             try
             {
-                IsPermissionGranted = _musicDictionary.MediaLibraryAuthorized;
                 await Task.Factory.StartNew(() =>
                 {
                     _musicDictionary.Messages = new List<string>();
                     var musicFiles = _musicDictionary.GetSongs();
-
-                    AllMusicFiles = musicFiles.Select(music =>
+                    AllMusicFiles = musicFiles?.Select(music =>
                     {
                         music._Duration = music.Duration;
-                        music._DurationTimeSpan = music.Duration.ToString().Split('.')[0];
+                        music._DurationTimeSpan = TimeSpan.FromSeconds(music.Duration)
+                            .ToString(music.Duration > (60 * 60) ? @"hh\:mm\:ss" : @"mm\:ss");
                         return music;
                     }).OrderBy(m => m.Title).ToList();
 
                     IsMediaExists = AllMusicFiles.Count > 0;
-                    IsSongsExist = !IsMediaExists;
                     MusicFiles = AllMusicFiles;
+                    IsPermissionGranted = IsMediaExists && _musicDictionary.MediaLibraryAuthorized;
                     SortOrderBy(PlaylistSortBy);
-                    if (MusicFiles.Count == 0)
-                        SetActivityResource(showError: true, errorMessage: TextResources.NoFileExists);
+
+                    _audioPlayerManager.CurrentPlayer.ReadyToPlay += (sender, e) => { CurrentPlay(); };
+                    _audioPlayerManager.CurrentPlayer.StartReached += async (sender, e) =>
+                    {
+                        await PlayCurrent(Previous());
+                    };
+                    _audioPlayerManager.CurrentPlayer.EndReached += async (sender, e) => { await PlayCurrent(Next()); };
+                    //if (MusicFiles.Count == 0)
+                    //    SetActivityResource(true, showMessage: true, message: TextResources.NoFileExists);
+                    //else
+                    SetActivityResource();
                 });
             }
             catch (Exception ex)
             {
-                SetActivityResource(showError: true, errorMessage: "Exception occurred");
                 new ExceptionHandler(nameof(AudioPlayerViewModel), ex);
             }
+        }
+        
+        private IAudioPlayer _currentPlayer;
+
+        private IAudioPlayer CurrentPlayer
+        {
+            get => _currentPlayer;
+            set => _currentPlayer = value;
+        }
+
+        private void AddMessage(string text)
+        {
+            var messages = new List<Message>();
+            Messages.ForEach((m) =>
+            {
+                messages.Add(m);
+            });
+            messages.Add(new Message() {Text = text});
+            Messages = new List<Message>();
+            Messages = messages;
+            IsMessageExists = Messages.Count() > 0;
         }
 
         private List<Message> _messages;
@@ -131,14 +163,23 @@ namespace com.organo.x4ever.ViewModels.Media
         {
             public string Text { get; set; }
         }
-        
-        private bool _isSongsExist;
-        public const string IsSongsExistPropertyName = "IsSongsExist";
 
-        public bool IsSongsExist
+        private bool _isMessageExists;
+        public const string IsMessageExistsPropertyName = "IsMessageExists";
+
+        public bool IsMessageExists
         {
-            get { return _isSongsExist; }
-            set { SetProperty(ref _isSongsExist, value, IsSongsExistPropertyName); }
+            get => _isMessageExists;
+            set => SetProperty(ref _isMessageExists, value, IsMessageExistsPropertyName);
+        }
+
+        private LayoutOptions _messageLayout;
+        public const string MessageLayoutPropertyName = "MessageLayout";
+
+        public LayoutOptions MessageLayout
+        {
+            get => _messageLayout;
+            set => SetProperty(ref _messageLayout, value, MessageLayoutPropertyName);
         }
 
         private bool IsLoopStarted { get; set; }
@@ -354,8 +395,8 @@ namespace com.organo.x4ever.ViewModels.Media
             ButtonImageSize = App.Configuration.GetImageSizeByID(ImageIdentity.AUDIO_PLAYER_PAGE_COMMAND_IMAGE);
             if (ButtonImageSize != null)
             {
-                AudioCommandImageHeight = ButtonImageSize.Height - 5;
-                AudioCommandImageWidth = ButtonImageSize.Width - 5;
+                AudioCommandImageHeight = ButtonImageSize.Height * 2;
+                AudioCommandImageWidth = ButtonImageSize.Width * 2;
             }
         }
 
@@ -420,6 +461,15 @@ namespace com.organo.x4ever.ViewModels.Media
             get { return _isPause; }
             set { SetProperty(ref _isPause, value, IsPausePropertyName); }
         }
+        
+        private bool _isRefreshing;
+        public const string IsRefreshingPropertyName = "IsRefreshing";
+
+        public bool IsRefreshing
+        {
+            get { return _isRefreshing; }
+            set { SetProperty(ref _isRefreshing, value, IsRefreshingPropertyName); }
+        }
 
         public async Task PlayCurrent(int songIndex)
         {
@@ -440,12 +490,12 @@ namespace com.organo.x4ever.ViewModels.Media
                     currentMusicFile.IsPlayNow = true;
                     currentMusicFile.TextColor = Palette._MainAccent;
                     CurrentMusicFile = currentMusicFile;
-                    MediaTitle = MusicFiles[songIndex].Title;
+                    MediaTitle = CurrentMusicFile.Title;
                     _audioPlayerManager.CurrentPlayer.PlaySong(CurrentMusicFile);
-                    IsDurationLong = _audioPlayerManager.CurrentPlayer.Duration > (60 * 60);
+                    CurrentPlayer = _audioPlayerManager.CurrentPlayer;
+                    IsDurationLong = CurrentMusicFile.Duration > (60 * 60);
                     TimeStyle = IsDurationLong ? @"hh\:mm\:ss" : @"mm\:ss";
-                    TotalTimer = TimeSpan.FromSeconds(_audioPlayerManager.CurrentPlayer.Duration).ToString(TimeStyle);
-                    CurrentPlay();
+                    TotalTimer = TimeSpan.FromSeconds(CurrentMusicFile.Duration).ToString(TimeStyle);
                 });
             }
             catch (Exception ex)
@@ -494,47 +544,40 @@ namespace com.organo.x4ever.ViewModels.Media
             set { SetProperty(ref _currentMusicFile, value, CurrentMusicFilePropertyName); }
         }
 
-        private ICommand _playCommand;
+        private ICommand _refreshCommand;
 
-        public ICommand PlayCommand
+        public ICommand RefreshCommand => _refreshCommand ?? (_refreshCommand = new Command(async (obj) =>
         {
-            get
+            IsRefreshing = true;
+            await GetFilesAsync();
+            IsRefreshing = false;
+        }));
+
+        private ICommand _playCommand;
+        public ICommand PlayCommand => _playCommand ?? (_playCommand = new Command( async (obj) =>
+        {
+            IsPlaying = IsPlaying == false;
+            if (IsPlaying)
             {
-                return _playCommand ?? (_playCommand = new Command(async (obj) =>
-                {
-                    IsPlaying = IsPlaying == false;
-                    if (IsPlaying)
-                    {
-                        if (IsPause)
-                            _audioPlayerManager.CurrentPlayer.Play();
-                        //else
-                        //    await PlayCurrent(CurrentSongIndex);
-                        IsPause = false;
-                    }
-                    else
-                    {
-                        IsPause = true;
-                        _audioPlayerManager.CurrentPlayer.Pause();
-                    }
-                }));
+                //if (IsPause)
+                await PlayCurrent(CurrentSongIndex);
+                IsPause = false;
             }
-        }
+            else
+            {
+                IsPause = true;
+                CurrentPlayer.Pause();
+            }
+        }));
 
         private ICommand _stopCommand;
-
-        public ICommand StopCommand
+        public ICommand StopCommand => _stopCommand ?? (_stopCommand = new Command(() =>
         {
-            get
-            {
-                return _stopCommand ?? (_stopCommand = new Command(() =>
-                {
-                    IsPlaying = false;
-                    StopAsync();
-                    CurrentTimer = TimeSpan.FromSeconds(0).ToString(TimeStyle);
-                    TimeSplitor = "";
-                }));
-            }
-        }
+            IsPlaying = false;
+            StopAsync();
+            CurrentTimer = TimeSpan.FromSeconds(0).ToString(TimeStyle);
+            TimeSplitor = "";
+        }));
 
         public void StopAsync()
         {
@@ -542,7 +585,7 @@ namespace com.organo.x4ever.ViewModels.Media
             {
                 IsLoopStarted = false;
                 CurrentPosition = 0;
-                _audioPlayerManager.CurrentPlayer.Pause();
+                CurrentPlayer.Pause();
             }
             catch
             {
@@ -551,30 +594,10 @@ namespace com.organo.x4ever.ViewModels.Media
         }
 
         private ICommand _nextCommand;
-
-        public ICommand NextCommand
-        {
-            get
-            {
-                return _nextCommand ?? (_nextCommand = new Command(async () =>
-                {
-                    await PlayCurrent(Next());
-                }));
-            }
-        }
+        public ICommand NextCommand => _nextCommand ?? (_nextCommand = new Command(async () => { await PlayCurrent(Next()); }));
 
         private ICommand _previousCommand;
-
-        public ICommand PreviousCommand
-        {
-            get
-            {
-                return _previousCommand ?? (_previousCommand = new Command(async () =>
-                {
-                    await PlayCurrent(Previous());
-                }));
-            }
-        }
+        public ICommand PreviousCommand => _previousCommand ?? (_previousCommand = new Command(async () => { await PlayCurrent(Previous()); }));
 
         //private ICommand _forwardCommand;
 
@@ -610,7 +633,6 @@ namespace com.organo.x4ever.ViewModels.Media
         //}
 
         private ICommand _checklistImageCommand;
-
         public ICommand ChecklistImageCommand => _checklistImageCommand ?? (_checklistImageCommand = new Command(() =>
         {
             IsChecklistSelected = !IsChecklistSelected;
@@ -649,10 +671,9 @@ namespace com.organo.x4ever.ViewModels.Media
 
         public Action DisplaySortByListAction { get; set; }
         public SortDirection SortDirect { get; set; }
-        private ICommand _sortCommand;
 
-        public ICommand SortCommand =>
-            _sortCommand ?? (_sortCommand = new Command(() => { DisplaySortByListAction?.Invoke(); }));
+        private ICommand _sortCommand;
+        public ICommand SortCommand => _sortCommand ?? (_sortCommand = new Command(() => { DisplaySortByListAction?.Invoke(); }));
 
         public void SortOrderBy(PlaylistSortList sort)
         {

@@ -88,8 +88,8 @@ namespace com.organo.x4ever.ios.Renderers
                 externalBorder.Name = borderName;
                 externalBorder.CornerRadius = Control.Layer.CornerRadius;
                 externalBorder.Frame = new CGRect(-.5, -.5, min + 1, min + 1);
-                externalBorder.BorderColor = ((FloatingActionButtonView)Element).BorderColor.ToCGColor();
-                externalBorder.BorderWidth = ((FloatingActionButtonView)Element).BorderThickness;
+                externalBorder.BorderColor = ((FloatingActionButtonView) Element).BorderColor.ToCGColor();
+                externalBorder.BorderWidth = ((FloatingActionButtonView) Element).BorderThickness;
 
                 Control.Layer.AddSublayer(externalBorder);
             }

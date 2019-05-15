@@ -89,7 +89,8 @@ namespace com.organo.x4ever.Pages.Registration
                     UserRegistered = DateTime.Now,
                     UserActivationKey = guid.ToString(),
                     UserMetas = null,
-                    UserApplication = _model.SelectedApplication
+                    UserApplication = _model.SelectedApplication,
+                    UserKey = App.Configuration?.GetUserKey()
                 };
                 var response = await _userPivotService.RegisterAsync(user);
                 _model.SetActivityResource();

@@ -15,25 +15,16 @@ namespace com.organo.x4ever
     {
 
         #region Player
+        event EventHandler EndReached;
+        event EventHandler StartReached;
+        event EventHandler ReadyToPlay;
 
         string ErrorMessage { get; set; }
-        float Rate { get; }
-        string ArtistName { get; set; }
-        string AlbumName { get; set; }
-        string SongTitle { get; set; }
-        Uri SongURL { get; set; }
         ImageSource Image { get; set; }
-        string SongDetail { get; set; }
-
-        Action PlayNextAction { get; set; }
-        Action PlayPreviousAction { get; set; }
-        Action ReadyToPlayAction { get; set; }
+        
         void PlaySong(MediaItem song);
         void Pause();
         void Play();
-
-
-
 
         #endregion Player
 

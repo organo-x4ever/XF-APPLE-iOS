@@ -17,8 +17,12 @@ namespace com.organo.x4ever.ios.Helpers
         public string GetModel => GetBundleValue("CFBundleVersion");
         public string GetManufacturer => "Apple";
         public string GetVersionString => GetBundleValue("CFBundleShortVersionString");
-        public string GetPlatform => "iOS";//GetBundleValue("CFBundleDisplayName") ?? GetBundleValue("CFBundleName");
+        public string GetPlatform => "iOS"; //GetBundleValue("CFBundleDisplayName") ?? GetBundleValue("CFBundleName");
         public string GetAppName => "X4Ever";
+
+        public int WidthPixels => (int) UIScreen.MainScreen.Bounds.Width; //width in units  
+
+        public int HeightPixels => (int) UIScreen.MainScreen.Bounds.Height; //height in units 
 
         static string GetBundleValue(string key)
             => NSBundle.MainBundle.ObjectForInfoDictionary(key).ToString();

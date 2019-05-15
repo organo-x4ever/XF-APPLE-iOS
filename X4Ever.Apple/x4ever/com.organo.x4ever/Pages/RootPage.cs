@@ -186,6 +186,7 @@ namespace com.organo.x4ever.Pages
 
                         case MenuType.Logout:
                             await App.LogoutAsync();
+                            App.Configuration.DeleteUserKey();
                             App.GoToAccountPage();
                             return;
                     }
@@ -197,7 +198,9 @@ namespace com.organo.x4ever.Pages
 
                 lastMenuType = id;
                 //id == MenuType.WorkoutVideos || //id == MenuType.MyMusic ||
-                if (id == MenuType.Settings || id == MenuType.OgxSystem)
+                if (id == MenuType.MyMusic || 
+                    id == MenuType.Settings || 
+                    id == MenuType.OgxSystem)
                     Pages.Remove(id);
 
                 //pop to root for Windows Phone

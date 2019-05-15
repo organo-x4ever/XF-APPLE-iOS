@@ -80,38 +80,7 @@ namespace com.organo.x4ever
             get { return Player != null ? Player.Rate : 0.0f; }
         }
 
-        private string _artistName;
-
-        public string ArtistName
-        {
-            get => _artistName;
-            set => _artistName = value;
-        }
-
-        private string _albumName;
-
-        public string AlbumName
-        {
-            get => _albumName;
-            set => _albumName = value;
-        }
-
-        private string _songTitle;
-
-        public string SongTitle
-        {
-            get => _songTitle;
-            set => _songTitle = value;
-        }
-
-        private Uri _songUrl;
-
-        public Uri SongURL
-        {
-            get => _songUrl;
-            set => _songUrl = value;
-        }
-
+        
         private ImageSource _image;
 
         public ImageSource Image
@@ -120,19 +89,11 @@ namespace com.organo.x4ever
             set => _image = value;
         }
 
-        private string _songDetail;
-
-        public string SongDetail
-        {
-            get => _songDetail;
-            set => _songDetail = value;
-        }
-
         private bool _isPlaying;
 
         public bool IsPlaying
         {
-            get => Player != null ? !(Player.Rate > 0.0f) : false;
+            get => !StreamingItemPaused; //Player != null ? (Player.CurrentTime.Seconds > 0) : false;
         }
 
         private string _errorMessage;
@@ -143,31 +104,7 @@ namespace com.organo.x4ever
             set => _errorMessage = value;
         }
 
-        private Action _playNextAction;
-
-        public Action PlayNextAction
-        {
-            get => _playNextAction;
-            set => _playNextAction = value;
-        }
-
-        private Action _playPreviousAction;
-
-        public Action PlayPreviousAction
-        {
-            get => _playPreviousAction;
-            set => _playPreviousAction = value;
-        }
-
-        private Action _readyToPlayAction;
-
-        public Action ReadyToPlayAction
-        {
-            get => _readyToPlayAction;
-            set => _readyToPlayAction = value;
-        }
-
-        public double Duration => Player.CurrentItem.Duration.Seconds;
+        public double Duration => CurrentSong.Duration; //Player.CurrentItem.Duration.Seconds;
 
         public double CurrentPosition => Player.CurrentTime.Seconds;
 
@@ -179,13 +116,6 @@ namespace com.organo.x4ever
         {
             _musicDictionary = DependencyService.Get<IMusicDictionary>();
             initSession();
-        }
-
-        public static AudioPlayerImplementation GetInstance()
-        {
-            if (AudioPlayerImplementation.myMusicPlayer == null)
-                AudioPlayerImplementation.myMusicPlayer = new AudioPlayerImplementation();
-            return AudioPlayerImplementation.myMusicPlayer;
         }
 
         // Initialize audio session
@@ -239,7 +169,7 @@ namespace com.organo.x4ever
 
             if (song != null)
             {
-                NSUrl Url = song.AssetURL;
+                NSUrl Url = song.SongURL;
                 item = AVPlayerItem.FromUrl(Url);
                 if (item != null)
                 {

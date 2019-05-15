@@ -9,8 +9,5 @@ namespace com.organo.x4ever.MediaManager
     public interface IAudioPlayerManager
     {
         IAudioPlayer CurrentPlayer { get; }
-        void PlayPreviousSong();
-        void PlayNextSong();
-        void Load();
     }
 }

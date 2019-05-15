@@ -12,6 +12,7 @@ namespace com.organo.x4ever.Models.Notifications
         public string DeviceIdiom { get; set; }
         public string DeviceApplication { get; set; }
         public DateTime IssuedOn { get; set; }
+        public string UserKey { get; set; }
     }
     public class UserPushTokenModelRegister
     {

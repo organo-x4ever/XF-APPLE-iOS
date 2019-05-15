@@ -6,7 +6,7 @@
     x:Class="com.organo.x4ever.Pages.MainPage.MainPage"
     xmlns:translate="clr-namespace:com.organo.x4ever.Localization"
     xmlns:extensions="clr-namespace:com.organo.x4ever.Extensions;assembly=com.organo.x4ever"
-    xmlns:controls1="clr-namespace:com.organo.x4ever.Controls"
+    xmlns:controls="clr-namespace:com.organo.x4ever.Controls"
     xmlns:statics="clr-namespace:com.organo.x4ever.Statics;assembly=com.organo.x4ever">
     <mainPage:MainPageXaml.Content>
         <StackLayout VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
@@ -32,14 +32,14 @@
                         <StackLayout Margin="15" IsVisible="{Binding IsEditable}" HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand">
                             <!--<Entry x:Name="EntryUsername" Placeholder="{translate:Translate EmailAddress}" IsPassword="False" Keyboard="Email" Style="{DynamicResource entryStyle}" Completed="entry_Completed" />-->
                             <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand">
-                                <controls1:EntryWithImage LineColor="{x:Static statics:Palette._MainAccent}" x:Name="EntryUsername" Placeholder="{translate:Translate EmailAddress}" Keyboard="Email" Style="{DynamicResource entryStyle1}" Completed="entry_Completed" Command="{Binding EmptyAction}" />
+                                <controls:EntryWithImage LineColor="{x:Static statics:Palette._MainAccent}" x:Name="EntryUsername" Placeholder="{translate:Translate EmailAddress}" Keyboard="Email" Style="{DynamicResource entryStyle1}" Completed="entry_Completed" Command="{Binding EmptyAction}" />
                                 <BoxView BackgroundColor="{x:Static statics:Palette._MainAccent}" HeightRequest="{Binding BoxHeight_Username}" HorizontalOptions="FillAndExpand" VerticalOptions="End"/>
                             </StackLayout>
                             <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand">
                                 <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
                                     <StackLayout HorizontalOptions="FillAndExpand">
                                         <!--<Entry x:Name="EntryPassword" Placeholder="{translate:Translate Password}" IsPassword="{Binding IsPassword}" Style="{DynamicResource entryStyle}" Completed="entry_Completed" />-->
-                                        <controls1:EntryWithImageActions LineColor="{x:Static statics:Palette._MainAccent}" x:Name="EntryPassword" Placeholder="{translate:Translate Password}" IsPassword="{Binding IsPassword}" 
+                                        <controls:EntryWithImageActions LineColor="{x:Static statics:Palette._MainAccent}" x:Name="EntryPassword" Placeholder="{translate:Translate Password}" IsPassword="{Binding IsPassword}" 
                                                                          Style="{DynamicResource entryStyle1}" Completed="entry_Completed" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"
                                                                          ImageRight="{translate:Translate icon_eye_hide}" ImageRightHeight="{Binding EyeImageHeight}" ImageRightWidth="{Binding EyeImageWidth}" ImageRightCommand="{Binding ShowPasswordAction}"
                                                                          ImageLeftCommand="{Binding EmptyAction}" />
@@ -66,7 +66,10 @@
                             </Grid>
                         </StackLayout>
                     </StackLayout>
-                    <controls1:FooterView Grid.Row="2" />
+                    <StackLayout Grid.Row="2" HorizontalOptions="Center" VerticalOptions="End" Margin="0" BackgroundColor="{x:Static statics:Palette._Transparent}">
+                        <Label Text="{Binding ApplicationVersion}" Style="{DynamicResource labelAccordionStyleHeaderIntern}" HorizontalOptions="Center" VerticalOptions="End" />
+                        <controls:FooterView></controls:FooterView>
+                    </StackLayout>
                 </Grid>
             </ScrollView>
         </StackLayout>

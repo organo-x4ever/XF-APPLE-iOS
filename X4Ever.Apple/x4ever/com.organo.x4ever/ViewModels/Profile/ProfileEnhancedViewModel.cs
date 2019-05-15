@@ -41,6 +41,7 @@ namespace com.organo.x4ever.ViewModels.Profile
             DisplayDetailLink = TextResources.Details;
             Seperator = "|";
             YourGoal = YouLost = ToLoose = GaugeMin = GaugeCurrent = 0;
+            GaugeCurrentChange();
             GaugeMax = 100;
             _imageSizeBadge = App.Configuration.GetImageSizeByID(ImageIdentity.USER_PROFILE_BADGE_ICON);
             if (_imageSizeBadge != null)

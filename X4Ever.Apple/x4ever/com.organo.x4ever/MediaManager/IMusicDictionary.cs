@@ -10,6 +10,7 @@ namespace com.organo.x4ever
         bool MediaLibraryDenied { get; }
         bool MediaLibraryRestricted { get; }
         bool MediaLibraryNotDetermined { get; }
+        bool Authorized();
         List<MediaItem> GetSongs();
         Dictionary<string, List<MediaItem>> GetSongsByAlbum();
         Dictionary<string, List<MediaItem>> GetSongsByArtist();

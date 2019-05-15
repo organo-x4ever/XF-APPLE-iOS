@@ -481,6 +481,11 @@
     <Content Include="Content\XMLFile1.xml" />
     <Content Include="logo_icon.ico" />
     <Content Include="PluginsHelp\ConnectivityReadme.txt" />
+    <EmbeddedResource Include="Resources\profile_user_password_128.png" />
+    <EmbeddedResource Include="Resources\profile_user_lock_128.png" />
+    <EmbeddedResource Include="Resources\profile_user_notification_128.png" />
+    <EmbeddedResource Include="Resources\profile_user_language_128.png" />
+    <EmbeddedResource Include="Resources\profile_user_edit_128.png" />
     <EmbeddedResource Include="Resources\sort_32x32.png" />
     <EmbeddedResource Include="Resources\sort_24x24.png" />
     <EmbeddedResource Include="Resources\sort_dark_32x32.png" />

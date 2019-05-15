@@ -107,12 +107,19 @@ namespace com.organo.x4ever.Pages.MainPage
                 _model.SetActivityResource();
         }
 
-        private void Page_Load()
+        private async void Page_Load()
         {
             _model.SetActivityResource();
             ButtonSignIn.Clicked += async (sender, e) => { await LoginCommand(); };
             Initialization(Message);
             VersionCheck();
+
+            if (!App.Configuration.IsUserKeyExists())
+            {
+                await Task.Delay(TimeSpan.FromSeconds(2));
+                App.Configuration.SetUserKey();
+                await DependencyService.Get<IUserPushTokenServices>().SaveDeviceTokenUnauthorized();
+            }
         }
 
         private void Initialization(string message = "")

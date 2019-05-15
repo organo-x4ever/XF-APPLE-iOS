@@ -13,5 +13,8 @@ namespace com.organo.x4ever.Helpers
         string GetVersionString { get; }
         string GetPlatform { get; }
         string GetAppName { get; }
+
+        int HeightPixels { get; }
+        int WidthPixels { get; }
     }
 }

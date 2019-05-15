@@ -5,6 +5,7 @@ using com.organo.x4ever.Services;
 using com.organo.x4ever.Statics;
 using Newtonsoft.Json;
 using System;
+using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -15,7 +16,7 @@ namespace com.organo.x4ever.Services
     public class UserPushTokenServices : IUserPushTokenServices
     {
         public string ControllerName => "pushnotifications";
-
+        public string ControllerName_UnAuthorized => "actions";
         public async Task<UserPushTokenModel> Get()
         {
             var model = new UserPushTokenModel();
@@ -69,6 +70,51 @@ namespace com.organo.x4ever.Services
             }
 
             return "";
+        }
+        
+        public async Task<string> SaveDeviceTokenUnauthorized()
+        {
+            var deviceToken = DependencyService.Get<ISecureStorage>().RetrieveStringFromBytes(Keys.DEVICE_TOKEN_IDENTITY);
+            if (deviceToken != null)
+            {
+                if (!string.IsNullOrEmpty(deviceToken))
+                {
+                    return await InsertUnauthorized(new UserPushTokenModel()
+                    {
+                        DeviceToken = deviceToken,
+                        IssuedOn = DateTime.Now,
+                        DeviceIdentity = string.Format(TextResources.AppVersion,
+                            App.Configuration.AppConfig.ApplicationVersion),
+                        DeviceIdiom = Device.Idiom.ToString(),
+                        UserKey = App.Configuration?.GetUserKey()
+                    });
+                }
+            }
+
+            return "";
+
+            async Task<string> InsertUnauthorized(UserPushTokenModel model)
+            {
+                try
+                {
+                    var response =
+                        await ClientService.PostDataNoHeaderAsync(model, ControllerName_UnAuthorized,
+                            "postnotification");
+                    if (response != null && response.IsSuccessStatusCode &&
+                        response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        var jsonTask = response.Content.ReadAsStringAsync();
+                        return jsonTask.Result.Contains(HttpConstants.SUCCESS)
+                            ? HttpConstants.SUCCESS
+                            : jsonTask.Result;
+                    }
+                    else return TextResources.MessageSomethingWentWrong;
+                }
+                catch (Exception)
+                {
+                    return TextResources.MessageSomethingWentWrong;
+                }
+            }
         }
     }
 }

@@ -9,7 +9,6 @@ using com.organo.x4ever.Pages.ChangePassword;
 using com.organo.x4ever.Pages.Notification;
 using com.organo.x4ever.Pages.UserSettings;
 using com.organo.x4ever.Statics;
-using com.organo.x4ever.Triggers;
 using com.organo.x4ever.Utilities;
 using com.organo.x4ever.ViewModels.Profile;
 using com.organo.x4ever.Views;
@@ -23,15 +22,23 @@ namespace com.organo.x4ever.Pages.Profile
 {
     public partial class ProfileEnhanced : ProfileEnhancedXaml
     {
-        private ProfileEnhancedViewModel _model;
+        private readonly ProfileEnhancedViewModel _model;
         private PopupLayout popupLayout;
         private readonly IAppVersionProvider _appVersionProvider = DependencyService.Get<IAppVersionProvider>();
+
+        // Profile Setting icon variables
+        private StackLayout _panel;
+        private double _panelWidth = -1;
+        private const float _settingImageSize = 128;
+        private const float _borderWidth = 0;
+        private bool _panelShowing;
 
         public ProfileEnhanced(RootPage root)
         {
             try
             {
                 InitializeComponent();
+                PanelShowing = false;
                 _model = new ProfileEnhancedViewModel(App.CurrentApp.MainPage.Navigation)
                 {
                     Root = root,
@@ -52,27 +59,25 @@ namespace com.organo.x4ever.Pages.Profile
         {
             await App.Configuration.InitialAsync(this);
             NavigationPage.SetHasNavigationBar(this, false);
+            
+            var height = DependencyService.Get<IDeviceInfo>().HeightPixels;
+            var width = DependencyService.Get<IDeviceInfo>().WidthPixels;
 
             _model.GetPageData();
-            await VersionCheck();
-
-            //await Task.Delay(TimeSpan.FromMilliseconds(2));
             UserSettingLayout();
+            await VersionCheck();
         }
 
-        //private RelativeLayout _layout;
-        private StackLayout _panel;
-        
-        private bool _PanelShowing = false;
         /// <summary>
         /// Gets a value to determine if the panel is showing or not
         /// </summary>
         /// <value><c>true</c> if panel showing; otherwise, <c>false</c>.</value>
         public bool PanelShowing
         {
-            get => _PanelShowing;
-            set => _PanelShowing = value;
+            get => _panelShowing;
+            set => _panelShowing = value;
         }
+        public bool PanelShowing1 { get => _panelShowing; set => _panelShowing = value; }
 
         private void UserSettingLayout()
         {
@@ -86,9 +91,6 @@ namespace com.organo.x4ever.Pages.Profile
             });
             CreatePanel();
         }
-        
-        private double _panelWidth = -1;
-
 
         /// <summary>
         /// Creates the right side menu panel
@@ -104,12 +106,12 @@ namespace com.organo.x4ever.Pages.Profile
                         new AnimatedImage(new FloatingActionButtonView
                             {
                                 ColorNormal = Palette._MainAccent,
-                                ImageWidth = 200,
-                                ImageHeight = 200,
-                                ImageName = ImageConstants.ICON_PROFILE_EDIT,
+                                ImageWidth = _settingImageSize,
+                                ImageHeight = _settingImageSize,
+                                ImageName = ImageConstants.ICON_PROFILE_EDIT_128,
                                 Size = FloatingActionButtonSize.Mini,
                                 BorderColor = Palette._MainAccent,
-                                BorderThickness = 3
+                                BorderThickness = _borderWidth
                             },
                             callback: async () =>
                             {
@@ -119,12 +121,12 @@ namespace com.organo.x4ever.Pages.Profile
                         new AnimatedImage(new FloatingActionButtonView
                             {
                                 ColorNormal = Palette._MainAccent,
-                                ImageWidth = 200,
-                                ImageHeight = 200,
-                                ImageName = ImageConstants.ICON_PROFILE_PASSWORD,
+                                ImageWidth = _settingImageSize,
+                                ImageHeight = _settingImageSize,
+                                ImageName = ImageConstants.ICON_PROFILE_LOCK_128,
                                 Size = FloatingActionButtonSize.Mini,
                                 BorderColor = Palette._MainAccent,
-                                BorderThickness = 3
+                                BorderThickness = _borderWidth
                             },
                             callback: async () =>
                             {
@@ -134,12 +136,12 @@ namespace com.organo.x4ever.Pages.Profile
                         new AnimatedImage(new FloatingActionButtonView
                             {
                                 ColorNormal = Palette._MainAccent,
-                                ImageWidth = 200,
-                                ImageHeight = 200,
-                                ImageName = ImageConstants.ICON_PROFILE_LANGUAGE,
+                                ImageWidth = _settingImageSize,
+                                ImageHeight = _settingImageSize,
+                                ImageName = ImageConstants.ICON_PROFILE_LANGUAGE_128,
                                 Size = FloatingActionButtonSize.Mini,
                                 BorderColor = Palette._MainAccent,
-                                BorderThickness = 3
+                                BorderThickness = _borderWidth
                             },
                             callback: async () =>
                             {
@@ -149,12 +151,12 @@ namespace com.organo.x4ever.Pages.Profile
                         new AnimatedImage(new FloatingActionButtonView
                             {
                                 ColorNormal = Palette._MainAccent,
-                                ImageWidth = 1000,
-                                ImageHeight = 1000,
-                                ImageName = ImageConstants.ICON_PROFILE_NOTIFICATION,
+                                ImageWidth = _settingImageSize,
+                                ImageHeight = _settingImageSize,
+                                ImageName = ImageConstants.ICON_PROFILE_NOTIFICATION_128,
                                 Size = FloatingActionButtonSize.Mini,
                                 BorderColor = Palette._MainAccent,
-                                BorderThickness = 3
+                                BorderThickness = _borderWidth
                             },
                             callback: async () =>
                             {
@@ -183,7 +185,7 @@ namespace com.organo.x4ever.Pages.Profile
                 );
             }
 
-            _model.IsUserSettingVisible = App.Configuration.IsProfileEditAllowed && _panel.Children.Count > 0;
+            _model.IsUserSettingVisible = _panel.Children.Count > 0 && App.Configuration.IsProfileEditAllowed;
         }
 
         /// <summary>
@@ -311,14 +313,9 @@ namespace com.organo.x4ever.Pages.Profile
                 HorizontalOptions = LayoutOptions.Center,
                 VerticalOptions = LayoutOptions.Center,
                 Margin = new Thickness(0, 0, 0, -10),
+                HeightRequest = 70,
+                WidthRequest = 70
             };
-            if (closeImageSize != null)
-            {
-                closeImage.WidthRequest = closeImageSize.Width;
-                closeImage.HeightRequest = closeImageSize.Height;
-                closeImage.MinimumWidthRequest = closeImageSize.Width;
-                closeImage.MinimumHeightRequest = closeImageSize.Height;
-            }
 
             var tapGestureRecognizer = new TapGestureRecognizer()
             {
@@ -478,7 +475,6 @@ namespace com.organo.x4ever.Pages.Profile
             }
         }
 
-        //await DependencyService.Get<IUserPushTokenServices>().SaveDeviceToken();
         private async Task VersionCheck()
         {
             await Task.Delay(TimeSpan.FromSeconds(3));
@@ -556,64 +552,6 @@ namespace com.organo.x4ever.Pages.Profile
             if (_model.TrackerPage == null)
                 await _model.ProduceTrackerLog();
             await Navigation.PushAsync(_model.TrackerPage);
-        }
-
-        private string CurrentProfileID => ProfileModifyID;//_model.UpdateProfileRequired ? ProfileModifyID : TrackerModifyID;
-        private string DefaultProfileID => "stackLayoutProfile"; //IdentityConstants.LAYOUT_PROFILE_ID;
-        private string TrackerModifyID => "stackLayoutTracker"; //IdentityConstants.LAYOUT_TRACKER_ID;
-        private string ProfileModifyID => "stackLayoutEditProfile"; //IdentityConstants.LAYOUT_EDIT_PROFILE_ID;
-
-        bool ShowEditProfilePanel = false;
-        protected void DisplayEditProfilePanel()
-        {
-            if (!ShowEditProfilePanel) // && !((View)buttonProfile.Parent.Parent).FindByName<View>(CurrentProfileID).IsVisible
-                SwitchEditProfilePanel();
-        }
-        protected void HideEditProfilePanel()
-        {
-            if (ShowEditProfilePanel)// && ((View)buttonProfile.Parent.Parent).FindByName<View>(CurrentProfileID).IsVisible)
-                SwitchEditProfilePanel();
-        }
-
-        protected void SwitchEditProfilePanel()
-        {
-            // swap the state
-            ShowEditProfilePanel = !ShowEditProfilePanel;
-
-            if (ShowEditProfilePanel)
-            {
-                SwitchView switchView = new SwitchView()
-                {
-                    Source = DefaultProfileID,
-                    Target = CurrentProfileID,
-                    Direction = SwitchView.eDirection.Left
-                };
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    switchView.Invoke(buttonProfile);
-                    if (CurrentProfileID == ProfileModifyID)
-                    {
-                        //await EditProfile();
-                    }
-                    else
-                    {
-                        //await UpdateTracker();
-                    }
-                });
-            }
-            else
-            {
-                SwitchView switchView = new SwitchView()
-                {
-                    Source = CurrentProfileID,
-                    Target = DefaultProfileID,
-                    Direction = SwitchView.eDirection.Right
-                };
-                Device.BeginInvokeOnMainThread(() =>
-                {
-                    switchView.Invoke(buttonProfile);
-                });
-            }
         }
     }
 

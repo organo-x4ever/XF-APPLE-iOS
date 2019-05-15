@@ -16,8 +16,6 @@ namespace com.organo.x4ever.ViewModels.Login
     {
         public LoginViewModel(INavigation navigation = null) : base(navigation)
         {
-            try
-            {
                 this.EmailAddress = string.Empty;
                 this.UserPassword = string.Empty;
                 this.PageBackgroundImage = ImageResizer.ResizeImage(App.Configuration.BackgroundImage, 800, 1280);
@@ -26,11 +24,16 @@ namespace com.organo.x4ever.ViewModels.Login
                 BoxHeight_Username = 1;
                 BoxHeight_Password = 1;
                 ShowPasswordAction = () => { IsPassword = IsPassword == false; };
-            }
-            catch (Exception)
-            {
-                //var ms = ex;
-            }
+                ApplicationVersion = string.Format(TextResources.AppVersion, App.Configuration.AppConfig.ApplicationVersion);
+        }
+
+        private string _applicationVersion;
+        public const string ApplicationVersionPropertyName = "ApplicationVersion";
+
+        public string ApplicationVersion
+        {
+            get { return _applicationVersion; }
+            set { SetProperty(ref _applicationVersion, value, ApplicationVersionPropertyName); }
         }
 
         private string emailAddress;
