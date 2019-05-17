@@ -153,6 +153,7 @@ namespace com.organo.x4ever.ViewModels.Profile
                 var gaugeCurrent = firstCurrent - lastCurrent;
                 GaugeCurrentConstant = (gaugeCurrent * 100) / (double) YourGoal;
                 GaugeCurrent = GaugeCurrentConstant > 100 ? 100 : GaugeCurrentConstant;
+                GaugeCurrentChange();
                 ChangeSliderValue(SliderGaugeModel, GaugeCurrent, 6);
             }
         }
@@ -674,7 +675,13 @@ namespace com.organo.x4ever.ViewModels.Profile
         public double GaugeCurrent
         {
             get { return _gaugeCurrent; }
-            set { SetProperty(ref _gaugeCurrent, value, GaugeCurrentPropertyName); }
+            set
+            {
+                double gaugeCurrent = 0;
+                if (value > 0)
+                    gaugeCurrent = value;
+                SetProperty(ref _gaugeCurrent, gaugeCurrent, GaugeCurrentPropertyName);
+            }
         }
 
         private void GaugeCurrentChange()

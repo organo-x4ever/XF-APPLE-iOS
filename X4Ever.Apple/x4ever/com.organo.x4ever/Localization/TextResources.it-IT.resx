@@ -1779,7 +1779,7 @@
   <data name="x4ever" xml:space="preserve">
     <value>X4Ever</value>
   </data>
-  <data name="SelectContinent" xml:space="preserve">
+  <data name="SelectRegion" xml:space="preserve">
     <value>Seleziona il tuo continente</value>
   </data>
   <data name="Continent" xml:space="preserve">
@@ -1859,5 +1859,8 @@
   </data>
   <data name="SortBy" xml:space="preserve">
     <value>Sort By</value>
+  </data>
+  <data name="Region" xml:space="preserve">
+    <value>Region</value>
   </data>
 </root>

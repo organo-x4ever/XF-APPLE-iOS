@@ -89,8 +89,7 @@ namespace com.organo.x4ever.Pages.Registration
                     UserRegistered = DateTime.Now,
                     UserActivationKey = guid.ToString(),
                     UserMetas = null,
-                    UserApplication = _model.SelectedApplication,
-                    UserKey = App.Configuration?.GetUserKey()
+                    UserApplication = _model.SelectedApplication
                 };
                 var response = await _userPivotService.RegisterAsync(user);
                 _model.SetActivityResource();
@@ -127,7 +126,7 @@ namespace com.organo.x4ever.Pages.Registration
             ValidationErrors validationErrors = new ValidationErrors();
 
             if (string.IsNullOrEmpty(_model.SelectedApplication))
-                validationErrors.Add(string.Format(TextResources.Required_MustBeSelected, TextResources.Continent));
+                validationErrors.Add(string.Format(TextResources.Required_MustBeSelected, TextResources.Region));
             if (string.IsNullOrEmpty(_model.EmailAddress))
                 validationErrors.Add(string.Format(TextResources.Required_IsMandatory, TextResources.EmailAddress));
             else if (!Regex.IsMatch(_model.EmailAddress.Trim(), CommonConstants.EMAIL_VALIDATION_REGEX))

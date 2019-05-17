@@ -71,6 +71,6 @@
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Allow X4ever access your Location always to display items according to your location.</string>
 	<key>CFBundleVersion</key>
-	<string>2.3.3</string>
+	<string>3.0.0</string>
 </dict>
 </plist>

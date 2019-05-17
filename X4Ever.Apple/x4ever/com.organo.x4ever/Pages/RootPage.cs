@@ -186,7 +186,6 @@ namespace com.organo.x4ever.Pages
 
                         case MenuType.Logout:
                             await App.LogoutAsync();
-                            App.Configuration.DeleteUserKey();
                             App.GoToAccountPage();
                             return;
                     }

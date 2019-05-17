@@ -8,6 +8,7 @@ using com.organo.x4ever.Pages.Base;
 using com.organo.x4ever.Pages.ChangePassword;
 using com.organo.x4ever.Pages.Notification;
 using com.organo.x4ever.Pages.UserSettings;
+using com.organo.x4ever.Services;
 using com.organo.x4ever.Statics;
 using com.organo.x4ever.Utilities;
 using com.organo.x4ever.ViewModels.Profile;
@@ -59,11 +60,9 @@ namespace com.organo.x4ever.Pages.Profile
         {
             await App.Configuration.InitialAsync(this);
             NavigationPage.SetHasNavigationBar(this, false);
-            
-            var height = DependencyService.Get<IDeviceInfo>().HeightPixels;
-            var width = DependencyService.Get<IDeviceInfo>().WidthPixels;
 
             _model.GetPageData();
+            await DependencyService.Get<IUserPushTokenServices>().SaveDeviceToken();
             UserSettingLayout();
             await VersionCheck();
         }
@@ -79,8 +78,9 @@ namespace com.organo.x4ever.Pages.Profile
         }
         public bool PanelShowing1 { get => _panelShowing; set => _panelShowing = value; }
 
-        private void UserSettingLayout()
+        private async void UserSettingLayout()
         {
+            await Task.Delay(TimeSpan.FromMilliseconds(750));
             _layout.GestureRecognizers.Add(new TapGestureRecognizer()
             {
                 Command = new Command((obj) =>
