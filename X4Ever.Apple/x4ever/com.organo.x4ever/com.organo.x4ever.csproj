@@ -63,6 +63,7 @@
     <Compile Include="Controls\GridMenu.cs" />
     <Compile Include="Controls\GridNews.cs" />
     <Compile Include="Controls\GridTracker.cs" />
+    <Compile Include="Controls\HybridWebView.cs" />
     <Compile Include="Controls\ImageAlignment.cs" />
     <Compile Include="Controls\PopupLayout.cs" />
     <Compile Include="Controls\LanguageOption.cs" />
@@ -156,6 +157,9 @@
     <Compile Include="Pages\Audio\AudioManagerPage.xaml.cs">
       <DependentUpon>AudioManagerPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Blog\BlogPage.xaml.cs">
+      <DependentUpon>BlogPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Community\CommunityPage.xaml.cs">
       <DependentUpon>CommunityPage.xaml</DependentUpon>
     </Compile>
@@ -201,12 +205,14 @@
     <Compile Include="Services\AppInfoService.cs" />
     <Compile Include="Services\ApplicationServices.cs" />
     <Compile Include="Services\ApplicationSettingService.cs" />
+    <Compile Include="Services\ConstantServices.cs" />
     <Compile Include="Services\IAppInfoService.cs" />
     <Compile Include="Services\IApplicationServices.cs" />
     <Compile Include="Services\IApplicationSettingService.cs" />
     <Compile Include="Services\IAudioPlayerService.cs" />
     <Compile Include="Services\IAVAudioManager.cs" />
     <Compile Include="Services\IAVAudioPlayerServices.cs" />
+    <Compile Include="Services\IConstantServices.cs" />
     <Compile Include="Services\IFileDownloadService.cs" />
     <Compile Include="Services\IInformationMessageServices.cs" />
     <Compile Include="Services\ILogServices.cs" />
@@ -468,6 +474,7 @@
     <Compile Include="ViewModels\Account\UploadPhotoViewModel.cs" />
     <Compile Include="ViewModels\Audio\AudioManagerViewModel.cs" />
     <Compile Include="ViewModels\Base\BaseViewModel.cs" />
+    <Compile Include="ViewModels\Blog\BlogViewModel.cs" />
     <Compile Include="ViewModels\ChangePassword\ChangePasswordViewModel.cs" />
     <Compile Include="ViewModels\Community\CommunityViewModel.cs" />
     <Compile Include="ViewModels\Content\ContentViewModel.cs" />
@@ -986,6 +993,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pages\Media\AudioPlayerPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pages\Blog\BlogPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>
