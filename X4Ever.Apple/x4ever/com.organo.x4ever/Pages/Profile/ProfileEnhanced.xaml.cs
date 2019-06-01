@@ -76,7 +76,12 @@ namespace com.organo.x4ever.Pages.Profile
             get => _panelShowing;
             set => _panelShowing = value;
         }
-        public bool PanelShowing1 { get => _panelShowing; set => _panelShowing = value; }
+
+        public bool PanelShowing1
+        {
+            get => _panelShowing;
+            set => _panelShowing = value;
+        }
 
         private async void UserSettingLayout()
         {
@@ -266,10 +271,7 @@ namespace com.organo.x4ever.Pages.Profile
                 },
 
                 // determine if we should repeat
-                repeat: () =>
-                {
-                    return repeatCount < 1;
-                }
+                repeat: () => { return repeatCount < 1; }
             );
         }
 
@@ -549,9 +551,16 @@ namespace com.organo.x4ever.Pages.Profile
 
         private async void ShowDetail(object sender, EventArgs args)
         {
-            if (_model.TrackerPage == null)
-                await _model.ProduceTrackerLog();
-            await Navigation.PushAsync(_model.TrackerPage);
+            if (!_model.ShowTrackerDetail)
+            {
+                _model.ShowTrackerDetail = true;
+                if (_model.TrackerPage == null)
+                    await _model.ProduceTrackerLog();
+                await Navigation.PushAsync(_model.TrackerPage);
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(2));
+            _model.ShowTrackerDetail = false;
         }
     }
 

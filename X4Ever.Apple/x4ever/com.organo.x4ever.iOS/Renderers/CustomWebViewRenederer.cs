@@ -37,7 +37,7 @@ namespace com.organo.x4ever.ios.Renderers
                 var customWebView = Element as CustomWebView;
                 var fileName = Path.Combine(DependencyService.Get<ILocalFile>().DownloadDirectoryPath(),
                     WebUtility.UrlEncode(customWebView.Uri));
-                Control.LoadRequest(new NSUrlRequest(new NSUrl(fileName, false)));
+                Control.LoadRequest(new NSUrlRequest(new NSUrl(fileName, false))); 
                 Control.ScalesPageToFit = true;
             }
         }

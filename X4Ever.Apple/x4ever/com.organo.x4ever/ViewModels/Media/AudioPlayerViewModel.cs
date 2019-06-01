@@ -22,6 +22,7 @@ namespace com.organo.x4ever.ViewModels.Media
         private IAudioPlayerManager _audioPlayerManager;
         private readonly IMusicDictionary _musicDictionary;
         private static short timerSeconds = 1;
+        private bool _songReloaded = false;
 
         public AudioPlayerViewModel(INavigation navigation = null) : base(navigation)
         {
@@ -40,7 +41,7 @@ namespace com.organo.x4ever.ViewModels.Media
             PlaylistMusicFiles = new List<MediaItem>();
             CurrentMusicFile = new MediaItem();
             PlayButton = ImageResizer.ResizeImage(TextResources.icon_media_play, ButtonImageSize);
-            PauseButton = ImageResizer.ResizeImage(TextResources.icon_media_pause, ButtonImageSize);
+            //PauseButton = ImageResizer.ResizeImage(TextResources.icon_media_pause, ButtonImageSize);
             StopButton = ImageResizer.ResizeImage(TextResources.icon_media_stop, ButtonImageSize);
             NextButton = ImageResizer.ResizeImage(TextResources.icon_media_next, ButtonImageSize);
             PreviousButton = ImageResizer.ResizeImage(TextResources.icon_media_previous, ButtonImageSize);
@@ -85,41 +86,19 @@ namespace com.organo.x4ever.ViewModels.Media
             }
         }
 
-        public async void OnLoad() => await GetFilesAsync();
-
         public async Task GetFilesAsync()
         {
-            MusicFiles = new List<MediaItem>();
-            AllMusicFiles = new List<MediaItem>();
-            Messages = new List<Message>();
             try
             {
-                await Task.Factory.StartNew(() =>
+                await Task.Factory.StartNew(async () =>
                 {
-                    _musicDictionary.Messages = new List<string>();
-                    var musicFiles = _musicDictionary.GetSongs();
-                    AllMusicFiles = musicFiles?.Select(music =>
-                    {
-                        music._Duration = music.Duration;
-                        music._DurationTimeSpan = TimeSpan.FromSeconds(music.Duration)
-                            .ToString(music.Duration > (60 * 60) ? @"hh\:mm\:ss" : @"mm\:ss");
-                        return music;
-                    }).OrderBy(m => m.Title).ToList();
-
-                    IsMediaExists = AllMusicFiles.Count > 0;
-                    MusicFiles = AllMusicFiles;
-                    IsPermissionGranted = IsMediaExists && _musicDictionary.MediaLibraryAuthorized;
-                    SortOrderBy(PlaylistSortBy);
-
+                    await SetSongs();
                     _audioPlayerManager.CurrentPlayer.ReadyToPlay += (sender, e) => { CurrentPlay(); };
                     _audioPlayerManager.CurrentPlayer.StartReached += async (sender, e) =>
                     {
                         await PlayCurrent(Previous());
                     };
                     _audioPlayerManager.CurrentPlayer.EndReached += async (sender, e) => { await PlayCurrent(Next()); };
-                    //if (MusicFiles.Count == 0)
-                    //    SetActivityResource(true, showMessage: true, message: TextResources.NoFileExists);
-                    //else
                     SetActivityResource();
                 });
             }
@@ -128,7 +107,43 @@ namespace com.organo.x4ever.ViewModels.Media
                 new ExceptionHandler(nameof(AudioPlayerViewModel), ex);
             }
         }
-        
+
+        private async Task SetSongs()
+        {
+            MusicFiles = new List<MediaItem>();
+            AllMusicFiles = new List<MediaItem>();
+            ClearMessage();
+            _musicDictionary.Messages = new List<string>();
+            var musicFiles = _musicDictionary.GetSongs();
+            AllMusicFiles = musicFiles?.Select(music =>
+            {
+                music._Duration = music.Duration;
+                music._DurationTimeSpan = TimeSpan.FromSeconds(music.Duration)
+                    .ToString(music.Duration > (60 * 60) ? @"hh\:mm\:ss" : @"mm\:ss");
+                return music;
+            }).OrderBy(m => m.Title).ToList();
+
+            IsMediaExists = AllMusicFiles.Count > 0;
+            MusicFiles = AllMusicFiles;
+            IsPermissionGranted = IsMediaExists && _musicDictionary.MediaLibraryAuthorized;
+            SortOrderBy(PlaylistSortBy);
+            if (MusicFiles.Count == 0)
+            {
+                if (!_songReloaded)
+                {
+                    _songReloaded = true;
+                    SetActivityResource(false, showBusy: true, busyMessage: "Reloading . . .");
+                    await Task.Delay(TimeSpan.FromMilliseconds(1500));
+                    //await SetSongs();
+                    RefreshCommand.Execute(null);
+                }
+                else
+                    SetActivityResource();
+            }
+            else
+                SetActivityResource();
+        }
+
         private IAudioPlayer _currentPlayer;
 
         private IAudioPlayer CurrentPlayer
@@ -147,6 +162,12 @@ namespace com.organo.x4ever.ViewModels.Media
             messages.Add(new Message() {Text = text});
             Messages = new List<Message>();
             Messages = messages;
+            IsMessageExists = Messages.Count() > 0;
+        }
+
+        private void ClearMessage()
+        {
+            Messages = new List<Message>();
             IsMessageExists = Messages.Count() > 0;
         }
 
@@ -250,14 +271,14 @@ namespace com.organo.x4ever.ViewModels.Media
             set { SetProperty(ref _playButton, value, PlayButtonPropertyName); }
         }
 
-        private ImageSource _pauseButton;
-        public string PauseButtonPropertyName = "PauseButton";
+        //private ImageSource _pauseButton;
+        //public string PauseButtonPropertyName = "PauseButton";
 
-        public ImageSource PauseButton
-        {
-            get { return _pauseButton; }
-            set { SetProperty(ref _pauseButton, value, PauseButtonPropertyName); }
-        }
+        //public ImageSource PauseButton
+        //{
+        //    get { return _pauseButton; }
+        //    set { SetProperty(ref _pauseButton, value, PauseButtonPropertyName); }
+        //}
 
         private ImageSource _playPauseButton;
         public string PlayPauseButtonPropertyName = "PlayPauseButton";
@@ -448,7 +469,7 @@ namespace com.organo.x4ever.ViewModels.Media
         private void IsPlayingChange()
         {
             if (IsPlaying)
-                PlayPauseButton = PauseButton;
+                PlayPauseButton = StopButton;
             else
                 PlayPauseButton = PlayButton;
         }
@@ -549,24 +570,32 @@ namespace com.organo.x4ever.ViewModels.Media
         public ICommand RefreshCommand => _refreshCommand ?? (_refreshCommand = new Command(async (obj) =>
         {
             IsRefreshing = true;
-            await GetFilesAsync();
+            await SetSongs();
             IsRefreshing = false;
         }));
 
         private ICommand _playCommand;
-        public ICommand PlayCommand => _playCommand ?? (_playCommand = new Command( async (obj) =>
+
+        public ICommand PlayCommand => _playCommand ?? (_playCommand = new Command(async (obj) =>
         {
+            if (MusicFiles.Count == 0)
+                await SetSongs();
+            if (MusicFiles.Count == 0) return;
             IsPlaying = IsPlaying == false;
             if (IsPlaying)
             {
                 //if (IsPause)
                 await PlayCurrent(CurrentSongIndex);
-                IsPause = false;
+                //IsPause = false;
             }
             else
             {
-                IsPause = true;
-                CurrentPlayer.Pause();
+                //IsPause = true;
+                IsPlaying = false;
+                StopAsync();
+                CurrentTimer = TimeSpan.FromSeconds(0).ToString(TimeStyle);
+                TimeSplitor = "";
+                //CurrentPlayer.Pause();
             }
         }));
 

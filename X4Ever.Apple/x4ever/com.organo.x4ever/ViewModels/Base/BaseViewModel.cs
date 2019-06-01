@@ -24,7 +24,6 @@ namespace com.organo.x4ever.ViewModels.Base
         {
             Navigation = navigation;
             _helper = DependencyService.Get<IHelper>();
-            IsUserSettingVisible = false;
         }
 
         public bool IsInitialized { get; set; }

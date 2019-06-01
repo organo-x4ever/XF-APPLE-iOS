@@ -36,6 +36,7 @@ namespace com.organo.x4ever.Pages.Media
                 Root = (RootPage) obj,
                 DisplaySortByListAction = DisplaySortByList
             };
+            _model.SetActivityResource(false, true);
             BindingContext = _model;
             await _model.GetFilesAsync();
         }

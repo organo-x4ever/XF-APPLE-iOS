@@ -11,6 +11,7 @@ namespace com.organo.x4ever.Services
     public class ConstantServices : IConstantServices
     {
         public async Task<string> Blogs() =>
-            await ClientService.GetStringAsync(new Uri(ClientService.GetRequestUri("constants", "blogs")));
+            await ClientService.GetStringAsync(new Uri(ClientService.GetRequestUri("constants",
+                $"blogs?region={App.Configuration.GetApplication()}&lang={App.Configuration?.AppConfig.DefaultLanguage}")));
     }
 }

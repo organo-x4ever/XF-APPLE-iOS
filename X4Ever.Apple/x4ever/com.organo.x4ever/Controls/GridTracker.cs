@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using com.organo.x4ever.Helpers;
 using com.organo.x4ever.Localization;
 using com.organo.x4ever.Models.User;
@@ -253,8 +254,6 @@ namespace com.organo.x4ever.Controls
                                     if (response != null && response.Contains(HttpConstants.SUCCESS))
                                     {
                                         control.CloseAction.Invoke();
-                                        //var showTracker = control.ProfileModel.UserDetail.IsTrackerRequiredAfterDelete;
-                                        //await control.ProfileModel.GetUserAsync(showTracker);
                                     }
                                 })
                             };

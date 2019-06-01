@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using System;
 using com.organo.x4ever.Controls;
 using com.organo.x4ever.Handler;
 using com.organo.x4ever.Pages.Base;
 using com.organo.x4ever.Services;
+using com.organo.x4ever.Statics;
 using com.organo.x4ever.ViewModels.Blog;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace com.organo.x4ever.Pages.Blog
 {
@@ -22,10 +19,7 @@ namespace com.organo.x4ever.Pages.Blog
             try
             {
                 InitializeComponent();
-                _model = new BlogViewModel()
-                {
-                    Root = root
-                };
+                _model = new BlogViewModel() {Root = root};
                 Init();
             }
             catch (Exception ex)
@@ -39,16 +33,15 @@ namespace com.organo.x4ever.Pages.Blog
             await App.Configuration.InitialAsync(this);
             NavigationPage.SetHasNavigationBar(this, false);
             BindingContext = _model;
-
-            HybridWebView hybridWebView = new HybridWebView()
+            _model.WebUri = await _model.GetLink();
+            contentView.Content = new HybridWebView()
             {
                 HorizontalOptions = LayoutOptions.FillAndExpand,
                 VerticalOptions = LayoutOptions.FillAndExpand,
-                Margin = new Thickness(0, -6, 0, 0)
+                Margin = new Thickness(0, -6, 0, 0),
+                BackgroundColor = Palette._MainBackground,
+                Uri = _model.WebUri
             };
-            _model.WebUri = await _model.GetLink();
-            hybridWebView.Uri = _model.WebUri;
-            contentView.Content = hybridWebView;
         }
     }
 

@@ -20,6 +20,18 @@ namespace com.organo.x4ever.Controls
             set { SetValue(UriProperty, value); }
         }
 
+        public static readonly BindableProperty SourceProperty = BindableProperty.Create(
+            propertyName: nameof(Source),
+            returnType: typeof(string),
+            declaringType: typeof(HybridWebView),
+            defaultValue: default(string));
+
+        public string Source
+        {
+            get => GetValue(SourceProperty) as string;
+            set => SetValue(SourceProperty, value);
+        }
+
         public void RegisterAction(Action<string> callback)
         {
             action = callback;

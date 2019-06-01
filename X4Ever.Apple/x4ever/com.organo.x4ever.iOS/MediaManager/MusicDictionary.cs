@@ -127,6 +127,74 @@ namespace com.organo.x4ever
                         Messages.Add(GetExceptionDetail(ex));
                     }
                 }
+                
+                #region
+
+                //return SetMediaItem(mediaQuery.Items);
+
+                //List<MediaItem> SetMediaItem(MPMediaItem[] songItems)
+                //{
+                //    return (from songItem in songItems
+                //        select new MediaItem()
+                //        {
+                //            Title = songItem.Title,
+                //            Album = songItem.AlbumTitle,
+
+                //            Artist = songItem.Artist,
+                //            SongID = songItem.PersistentID,
+
+                //            Artwork = songItem.Artwork != null
+                //                ? ImageSource.FromStream(() =>
+                //                    songItem.Artwork.ImageWithSize(new CGSize(115.0f, 115.0f)).AsPNG().AsStream())
+                //                : null,
+                //            Duration = songItem.PlaybackDuration,
+                //            SongURL = songItem.AssetURL,
+                //            AlbumArtist = songItem.AlbumArtist,
+                //            AlbumArtistPersistentID = songItem.AlbumArtistPersistentID,
+                //            AlbumPersistentID = songItem.AlbumPersistentID,
+
+                //            AlbumTrackCount = songItem.AlbumTrackCount,
+                //            AlbumTrackNumber = songItem.AlbumTrackNumber,
+                //            ArtistPersistentID = songItem.ArtistPersistentID,
+                //            AssetURL = songItem.AssetURL,
+                //            BeatsPerMinute = songItem.BeatsPerMinute,
+                //            BookmarkTime = songItem.BookmarkTime,
+                //            Comments = songItem.Comments,
+                //            Composer = songItem.Composer,
+                //            ComposerPersistentID = songItem.ComposerPersistentID,
+
+                //            DateAdded = songItem.DateAdded != null
+                //                ? songItem.DateAdded.ToDateTime()
+                //                : new DateTime(1900, 1, 1),
+                //            DiscCount = songItem.DiscCount,
+                //            DiscNumber = songItem.DiscNumber,
+                //            Genre = songItem.Genre,
+                //            GenrePersistentID = songItem.GenrePersistentID,
+                //            HasProtectedAsset = songItem.HasProtectedAsset,
+                //            IsCloudItem = songItem.IsCloudItem,
+                //            IsCompilation = songItem.IsCompilation,
+                //            IsExplicitItem = songItem.IsExplicitItem,
+
+                //            LastPlayedDate = songItem.LastPlayedDate != null
+                //                ? songItem.LastPlayedDate.ToDateTime()
+                //                : new DateTime(1900, 1, 1),
+                //            Lyrics = songItem.Lyrics,
+                //            MediaType = songItem.MediaType.ToString(),
+                //            PlayCount = songItem.PlayCount,
+                //            PlaybackStoreID = songItem.PlaybackStoreID,
+                //            PodcastPersistentID = songItem.PodcastPersistentID,
+
+                //            PodcastTitle = songItem.PodcastTitle,
+                //            Rating = songItem.Rating,
+                //            ReleaseDate = songItem.ReleaseDate != null
+                //                ? songItem.ReleaseDate.ToDateTime()
+                //                : new DateTime(1900, 1, 1),
+                //            SkipCount = songItem.SkipCount,
+                //            UserGrouping = songItem.UserGrouping,
+                //        }).ToList();
+                //}
+
+                #endregion
             }
             catch (Exception ex)
             {

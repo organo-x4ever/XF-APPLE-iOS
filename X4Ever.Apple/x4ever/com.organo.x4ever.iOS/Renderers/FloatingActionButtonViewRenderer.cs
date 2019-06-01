@@ -25,6 +25,22 @@ namespace com.organo.x4ever.ios.Renderers
     [Preserve(AllMembers = true)]
     public class FloatingActionButtonViewRenderer : ImageRenderer
     {
+        private const int MARGIN_DIPS_SMALL = 10;
+        private const int MARGIN_DIPS = 16;
+        private const int FAB_HEIGHT_NORMAL = 56;
+        private const int FAB_HEIGHT_NORMAL_MINI = 48;
+        private const int FAB_HEIGHT_MINI = 40;
+        private const int FAB_NORMAL_FRAME_HEIGHT_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_NORMAL;
+        private const int FAB_NORMAL_FRAME_WIDTH_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_NORMAL;
+
+        private const int FAB_NORMAL_MINI_FRAME_HEIGHT_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_NORMAL_MINI;
+        private const int FAB_NORMAL_MINI_FRAME_WIDTH_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_NORMAL_MINI;
+
+        private const int FAB_MINI_FRAME_HEIGHT_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_MINI;
+        private const int FAB_MINI_FRAME_WIDTH_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_MINI;
+
+        const string borderName = "borderLayerName";
+
         /// <summary>
         /// Used for registration with dependency service
         /// </summary>
@@ -141,22 +157,5 @@ namespace com.organo.x4ever.ios.Renderers
                 }
             }
         }
-
-        private const int MARGIN_DIPS_SMALL = 10;
-        private const int MARGIN_DIPS = 16;
-        private const int FAB_HEIGHT_NORMAL = 56;
-        private const int FAB_HEIGHT_NORMAL_MINI = 48;
-        private const int FAB_HEIGHT_MINI = 40;
-        private const int FAB_NORMAL_FRAME_HEIGHT_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_NORMAL;
-        private const int FAB_NORMAL_FRAME_WIDTH_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_NORMAL;
-
-        private const int FAB_NORMAL_MINI_FRAME_HEIGHT_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_NORMAL_MINI;
-        private const int FAB_NORMAL_MINI_FRAME_WIDTH_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_NORMAL_MINI;
-
-        private const int FAB_MINI_FRAME_HEIGHT_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_MINI;
-        private const int FAB_MINI_FRAME_WIDTH_WITH_PADDING = (MARGIN_DIPS_SMALL * 2) + FAB_HEIGHT_MINI;
-
-
-        const string borderName = "borderLayerName";
     }
 }

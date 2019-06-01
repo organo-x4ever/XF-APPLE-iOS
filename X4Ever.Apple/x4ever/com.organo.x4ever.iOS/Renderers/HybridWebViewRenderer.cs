@@ -1,8 +1,10 @@
 ﻿
+using System.Diagnostics;
 using com.organo.x4ever.Controls;
 using com.organo.x4ever.ios.Renderers;
 using Foundation;
 using System.IO;
+using com.organo.x4ever.Statics;
 using WebKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
@@ -47,6 +49,7 @@ namespace com.organo.x4ever.ios.Renderers
             {
                 //string fileName = Path.Combine(NSBundle.MainBundle.BundlePath, string.Format("Content/{0}", Element.Uri));
                 Control.LoadRequest(new NSUrlRequest(new NSUrl(Element.Uri)));
+                //Control.BackgroundColor = Palette._MainBackground.ToUIColor();
             }
         }
 

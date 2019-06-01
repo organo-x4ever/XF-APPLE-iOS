@@ -296,6 +296,13 @@ namespace com.organo.x4ever.Services
                     request.Headers.Add(HttpConstants.PLATFORM, platform);
             }
 
+            if (!request.Headers.Contains(HttpConstants.VERSION))
+            {
+                var version = App.Configuration?.AppConfig.ApplicationVersion;
+                if (!string.IsNullOrEmpty(version))
+                    request.Headers.Add(HttpConstants.VERSION, version);
+            }
+
             return request;
         }
 
@@ -330,6 +337,13 @@ namespace com.organo.x4ever.Services
                 var platform = DeviceInfo.GetPlatform;
                 if (platform != null)
                     request.Headers.Add(HttpConstants.PLATFORM, platform);
+            }
+            
+            if (!request.Headers.Contains(HttpConstants.VERSION))
+            {
+                var version = App.Configuration?.AppConfig.ApplicationVersion;
+                if (!string.IsNullOrEmpty(version))
+                    request.Headers.Add(HttpConstants.VERSION, version);
             }
 
             return request;

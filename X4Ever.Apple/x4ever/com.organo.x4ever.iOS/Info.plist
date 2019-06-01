@@ -44,10 +44,6 @@
 	<string>10.0</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.organo.xchallenge</string>
-	<key>NSHealthUpdateUsageDescription</key>
-	<string>Allow X4Ever update Health information to track progress</string>
-	<key>NSHealthShareUsageDescription</key>
-	<string>Allow X4Ever share Health information</string>
 	<key>kTCCServiceMediaLibrary</key>
 	<string>Allow X4Ever to play music files from your Music Library inside the app.</string>
 	<key>NSSiriUsageDescription</key>
@@ -76,6 +72,6 @@
 		<true/>
 	</dict>
 	<key>CFBundleVersion</key>
-	<string>3.0.0</string>
+	<string>3.0.2</string>
 </dict>
 </plist>

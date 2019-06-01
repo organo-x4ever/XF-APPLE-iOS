@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿
+using System;
 using System.Threading.Tasks;
 using com.organo.x4ever.Pages.Base;
 using com.organo.x4ever.ViewModels.Profile;
 using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
 
 namespace com.organo.x4ever.Pages.Profile
 {
@@ -38,22 +35,20 @@ namespace com.organo.x4ever.Pages.Profile
 
         private async void SetGridTracker()
         {
-            await Task.Factory.StartNew(async () =>
+            await Task.Factory.StartNew(() =>
             {
                 gridTracker.ProfileModel = _model;
                 gridTracker.Source = _model.UserTrackers;
                 gridTracker.CloseAction = async () =>
                 {
                     _model.ShowTrackerDetail = false;
-                    await _model.PopAsync();
-                    await gridTracker.ProfileModel.GetUserAsync(
-                        gridTracker.ProfileModel.UserDetail.IsTrackerRequiredAfterDelete);
+                    await Navigation.PopAsync();
+                    await gridTracker.ProfileModel.GetUserAsync(gridTracker.ProfileModel.UserDetail
+                        .IsTrackerRequiredAfterDelete);
                 };
-                await Task.Delay(TimeSpan.FromMilliseconds(1000));
-                _model.ShowTrackerDetail = false;
             });
         }
-        
+
         public void Dispose()
         {
             _model.ShowTrackerDetail = false;

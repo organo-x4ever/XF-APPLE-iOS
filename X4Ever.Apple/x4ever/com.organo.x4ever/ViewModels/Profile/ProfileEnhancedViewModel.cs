@@ -31,7 +31,7 @@ namespace com.organo.x4ever.ViewModels.Profile
        private readonly ImageSize _imageSizeBadge;
        private readonly PoundToKiligramConverter _converter = new PoundToKiligramConverter();
 
-        public ProfileEnhancedViewModel(Xamarin.Forms.INavigation navigation = null) : base(navigation)
+        public ProfileEnhancedViewModel(INavigation navigation = null) : base(navigation)
         {
             _userPivotService = DependencyService.Get<IUserPivotService>();
             _trackerPivotService = DependencyService.Get<ITrackerPivotService>();
@@ -120,11 +120,9 @@ namespace com.organo.x4ever.ViewModels.Profile
                     MilestoneRequired = UserDetail.IsWeightSubmissionRequired;
                 }
 
-                LoadGauge();
-                GetTrackerData();
                 if (showTracker && MilestoneRequired)
                 {
-                    await Task.Delay(TimeSpan.FromMilliseconds(1500));
+                    await Task.Delay(TimeSpan.FromMilliseconds(750));
                     Device.BeginInvokeOnMainThread(async () =>
                     {
                         await App.CurrentApp.MainPage.Navigation.PushModalAsync(
@@ -132,12 +130,14 @@ namespace com.organo.x4ever.ViewModels.Profile
                     });
                 }
 
-                await ProduceTrackerLog();
+                GetTrackerData();
+                LoadGauge();
+                if (!(showTracker && MilestoneRequired))
+                    await ProduceTrackerLog();
             }
             catch (Exception ex)
             {
-                var exceptionHandler = new ExceptionHandler(typeof(ProfileEnhancedViewModel).FullName, ex);
-                //
+                _ = new ExceptionHandler(typeof(ProfileEnhancedViewModel).FullName, ex);
             }
         }
 
@@ -686,7 +686,7 @@ namespace com.organo.x4ever.ViewModels.Profile
 
         private void GaugeCurrentChange()
         {
-            GaugeCurrentText = $"{GaugeCurrent}%";
+            GaugeCurrentText = $"{Math.Round(GaugeCurrent, 0)}%";
         }
 
         public string _gaugeCurrentText;
