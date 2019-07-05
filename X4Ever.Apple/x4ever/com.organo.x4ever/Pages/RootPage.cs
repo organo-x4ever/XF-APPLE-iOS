@@ -7,12 +7,12 @@ using com.organo.x4ever.Pages.Community;
 using com.organo.x4ever.Pages.HowItWorks;
 using com.organo.x4ever.Pages.MealPlan;
 using com.organo.x4ever.Pages.Media;
-using com.organo.x4ever.Pages.News;
 using com.organo.x4ever.Pages.OGX;
 using com.organo.x4ever.Pages.Profile;
 using com.organo.x4ever.Pages.Rewards;
 using com.organo.x4ever.Pages.Video;
 using com.organo.x4ever.Pages.YouTube;
+using com.organo.x4ever.Pages.Miscellaneous;
 using com.organo.x4ever.Statics;
 using com.organo.x4ever.ViewModels.Base;
 using System;
@@ -184,6 +184,16 @@ namespace com.organo.x4ever.Pages
                             SetDetailIfNull(page);
                             Pages.Add(id, page);
                             break;
+                            
+                        case MenuType.More:
+                            page = new XNavigationPage(new MiscContentPage(this)
+                            {
+                                Title = TextResources.MainTabs_More,
+                                Icon = new FileImageSource {File = TextResources.MainTabs_More_Icon}
+                            });
+                            SetDetailIfNull(page);
+                            Pages.Add(id, page);
+                            break;
 
                         case MenuType.Logout:
                             await App.LogoutAsync();
@@ -200,7 +210,8 @@ namespace com.organo.x4ever.Pages
                 //id == MenuType.WorkoutVideos || //id == MenuType.MyMusic ||
                 if (id == MenuType.MyMusic || 
                     id == MenuType.Settings || 
-                    id == MenuType.OgxSystem)
+                    id == MenuType.OgxSystem ||
+                    id == MenuType.More)
                     Pages.Remove(id);
 
                 //pop to root for Windows Phone
@@ -266,6 +277,7 @@ namespace com.organo.x4ever.Pages
         MyMusic,
         Community,
         Settings,
+        More,
         Logout
     }
 

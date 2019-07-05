@@ -181,6 +181,9 @@
     <Compile Include="Pages\MenuGridPage.xaml.cs">
       <DependentUpon>MenuGridPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\Miscellaneous\MiscContentPage.xaml.cs">
+      <DependentUpon>MiscContentPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\Notification\NotificationSettingPage.xaml.cs">
       <DependentUpon>NotificationSettingPage.xaml</DependentUpon>
     </Compile>
@@ -488,6 +491,7 @@
     <Compile Include="ViewModels\Menu\MenuPageViewModel.cs" />
     <Compile Include="ViewModels\Message\MessageViewModel.cs" />
     <Compile Include="ViewModels\Milestone\UserMilestoneViewModel.cs" />
+    <Compile Include="ViewModels\Miscellaneous\MiscContentViewModel.cs" />
     <Compile Include="ViewModels\News\NewsViewModel.cs" />
     <Compile Include="ViewModels\Notification\NotificationSettingViewModel.cs" />
     <Compile Include="ViewModels\OGX\OGXViewModel.cs" />
@@ -999,6 +1003,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Pages\Blog\BlogPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Pages\Miscellaneous\MiscContentPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

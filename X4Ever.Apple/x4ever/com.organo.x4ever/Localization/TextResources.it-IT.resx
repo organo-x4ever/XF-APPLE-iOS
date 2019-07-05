@@ -1863,4 +1863,13 @@
   <data name="Region" xml:space="preserve">
     <value>Region</value>
   </data>
+  <data name="ReviseWeightText" xml:space="preserve">
+    <value>Vuoi perdere più del {0}% del peso attuale, REALMENTE?</value>
+  </data>
+  <data name="MainTabs_More" xml:space="preserve">
+    <value>DI PIÙ</value>
+  </data>
+  <data name="MainTabs_More_Icon" xml:space="preserve">
+    <value>icon_more.png</value>
+  </data>
 </root>

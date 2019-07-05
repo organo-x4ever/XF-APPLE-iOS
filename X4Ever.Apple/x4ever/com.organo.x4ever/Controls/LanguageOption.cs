@@ -12,12 +12,14 @@ namespace com.organo.x4ever.Controls
     {
         private static Image flagImage;
 
-        private static Label nameLabel = new Label()
+        private Label _nameLabel;
+        public const string NameLabelPropertyName = "NameLabel";
+
+        private Label NameLabel
         {
-            Text = "",
-            VerticalOptions = LayoutOptions.Center,
-            HorizontalOptions = LayoutOptions.Start
-        };
+            get => _nameLabel;
+            set => SetLanguageProperty(ref _nameLabel, value, NameLabelPropertyName);
+        }
 
         private static Picker pickerLanguage = new Picker() { IsVisible = false, Title = TextResources.SelectLanguage };
 
@@ -32,8 +34,14 @@ namespace com.organo.x4ever.Controls
                 Orientation = StackOrientation.Horizontal,
                 HorizontalOptions = LayoutOptions.StartAndExpand
             };
+            NameLabel = new Label()
+            {
+                Text = "",
+                VerticalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Start
+            };
             //layout.Children.Add(flagImage);
-            layout.Children.Add(nameLabel);
+            layout.Children.Add(NameLabel);
             layout.Children.Add(pickerLanguage);
             layout.GestureRecognizers.Add(t);
             Content = layout;
@@ -50,7 +58,7 @@ namespace com.organo.x4ever.Controls
 
         protected void TextStyleChanged()
         {
-            nameLabel.Style = TextStyle;
+            NameLabel.Style = TextStyle;
         }
 
         private Style _flagStyle;
@@ -112,7 +120,7 @@ namespace com.organo.x4ever.Controls
         protected void OnDataSourceSelectedChanged()
         {
             //flagImage.Source = ImageSource.FromUri(new Uri(DataSourceSelected.CountryFlag));
-            nameLabel.Text = DataSourceSelected.LanguageName;
+            NameLabel.Text = DataSourceSelected.LanguageName;
         }
 
         public Action OnItemSelectedAction { get; set; }
@@ -166,6 +174,11 @@ namespace com.organo.x4ever.Controls
         }
 
         private void OnTapped(object sender, EventArgs e)
+        {
+            LanguageChange_Click();
+        }
+
+        public void LanguageChange_Click()
         {
             pickerLanguage.ItemsSource = DataSource;
             pickerLanguage.ItemDisplayBinding = new Binding("LanguageName");

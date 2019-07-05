@@ -23,6 +23,10 @@ namespace com.organo.x4ever.Pages.Account
         private readonly ITrackerPivotService _trackerPivotService;
         private readonly IHelper _helper;
         private readonly PoundToKiligramConverter _converter = new PoundToKiligramConverter();
+        private const string revisionNumber = "10000";
+        // Ask to revise if user wants to lose more than
+        private const int AskToRevisePercent = 40;
+        private bool IsRevised { get; set; }
 
         public PersonalInfoPage(UserFirstUpdate user)
         {
@@ -31,6 +35,7 @@ namespace com.organo.x4ever.Pages.Account
             _metaPivotService = DependencyService.Get<IMetaPivotService>();
             _trackerPivotService = DependencyService.Get<ITrackerPivotService>();
             _helper = DependencyService.Get<IHelper>();
+            IsRevised = false;
             Init();
         }
 
@@ -75,25 +80,25 @@ namespace com.organo.x4ever.Pages.Account
             {
                 _user.UserMetas.Add(_metaPivotService.AddMeta(_model.AgeValue.ToString(), MetaConstants.AGE,
                     MetaConstants.AGE, MetaConstants.LABEL));
-                
+
                 var tracker = _trackerPivotService.AddTracker(TrackerConstants.CURRENT_WEIGHT,
                     _model.CurrentWeightValue.ToString());
-                tracker.RevisionNumber = "10000";
+                tracker.RevisionNumber = revisionNumber;
                 _user.UserTrackers.Add(tracker);
-                
+
                 tracker = _trackerPivotService.AddTracker(TrackerConstants.CURRENT_WEIGHT_UI,
                     _model.CurrentWeightValue.ToString());
-                tracker.RevisionNumber = "10000";
+                tracker.RevisionNumber = revisionNumber;
                 _user.UserTrackers.Add(tracker);
 
                 tracker = _trackerPivotService.AddTracker(TrackerConstants.WEIGHT_VOLUME_TYPE,
                     App.Configuration.AppConfig.DefaultWeightVolume);
-                tracker.RevisionNumber = "10000";
+                tracker.RevisionNumber = revisionNumber;
                 _user.UserTrackers.Add(tracker);
 
                 _user.UserMetas.Add(_metaPivotService.AddMeta(_model.WeightLossGoalValue.ToString(),
                     MetaConstants.WEIGHT_LOSS_GOAL, MetaConstants.WEIGHT_LOSS_GOAL, MetaConstants.LABEL));
-                
+
                 _user.UserMetas.Add(_metaPivotService.AddMeta(_model.WeightLossGoalValue.ToString(),
                     MetaConstants.WEIGHT_LOSS_GOAL_UI, MetaConstants.WEIGHT_LOSS_GOAL_UI, MetaConstants.LABEL));
 
@@ -142,6 +147,15 @@ namespace com.organo.x4ever.Pages.Account
                 validationErrors.Add(string.Format(TextResources.Validation_MustBeMoreThan,
                     TextResources.WeightLossGoal,
                     _converter.DisplayWeightVolume(App.Configuration.AppConfig.MINIMUM_WEIGHT_LOSE_KG)));
+            _model.ReviseRequestText = string.Empty;
+            if (!IsRevised && (_model.WeightLossGoalValue > _model.CurrentWeightValue / 100 * AskToRevisePercent))
+            {
+                _model.ReviseRequestText = string.Format(TextResources.ReviseWeightText, AskToRevisePercent);
+                validationErrors.Add(_model.ReviseRequestText);
+                _model.NextButtonText = TextResources.Yes + ", " + TextResources.Continue;
+            }
+            IsRevised = true;
+
             if (validationErrors.Count() > 0)
                 _model.SetActivityResource(showError: true,
                     errorMessage: validationErrors.Count() > 2

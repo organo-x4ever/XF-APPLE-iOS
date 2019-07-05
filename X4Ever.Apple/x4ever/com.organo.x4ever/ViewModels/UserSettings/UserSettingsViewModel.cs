@@ -30,9 +30,9 @@ namespace com.organo.x4ever.ViewModels.UserSettings
 
         public async Task LoadAppLanguages(Action action)
         {
-            ApplicationLanguages = await DependencyService.Get<IApplicationLanguageService>().GetWithCountryAsync();
+           var applicationLanguages = await DependencyService.Get<IApplicationLanguageService>().GetWithCountryAsync();
 
-            ApplicationLanguages = ApplicationLanguages.Select(l =>
+            ApplicationLanguages = applicationLanguages.Select(l =>
             {
                 l.IsSelected = l.LanguageCode == App.Configuration.AppConfig.DefaultLanguage;
                 return l;

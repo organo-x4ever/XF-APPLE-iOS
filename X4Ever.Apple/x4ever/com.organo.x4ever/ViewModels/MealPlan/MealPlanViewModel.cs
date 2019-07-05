@@ -165,7 +165,7 @@ namespace com.organo.x4ever.ViewModels.MealPlan
                     HasUnevenRows = true,
                     BackgroundColor = Color.Transparent
                 };
-                contentListView.HeightRequest = (contentListView.RowHeight * (mealPlanOptionListDetails.Count)) + 65;
+                //contentListView.HeightRequest = (contentListView.RowHeight * (mealPlanOptionListDetails.Count)) + 65;
                 contentListView.ItemSelected += (sender, e) => contentListView.SelectedItem = null;
             });
             return new AccordionMultiViewSource()

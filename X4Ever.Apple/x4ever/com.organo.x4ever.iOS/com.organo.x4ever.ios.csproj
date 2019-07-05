@@ -482,6 +482,7 @@
     <Content Include="Content\XMLFile1.xml" />
     <Content Include="logo_icon.ico" />
     <Content Include="PluginsHelp\ConnectivityReadme.txt" />
+    <EmbeddedResource Include="Resources\icon_more.png" />
     <EmbeddedResource Include="Resources\profile_user_password_128.png" />
     <EmbeddedResource Include="Resources\profile_user_lock_128.png" />
     <EmbeddedResource Include="Resources\profile_user_notification_128.png" />

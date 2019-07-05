@@ -7,16 +7,19 @@
     xmlns:controls="clr-namespace:com.organo.x4ever.Controls;assembly=com.organo.x4ever"
     xmlns:localization="clr-namespace:com.organo.x4ever.Localization;assembly=com.organo.x4ever"
     xmlns:statics="clr-namespace:com.organo.x4ever.Statics;assembly=com.organo.x4ever">
-  <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="15,15,15,0">
+    <StackLayout HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" Margin="15,15,15,0">
       <Label Text="{localization:Translate UserSettings}" Style="{DynamicResource labelStyleXLargeHeader}" HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0" />
       <StackLayout Orientation="Vertical" VerticalOptions="StartAndExpand" HorizontalOptions="CenterAndExpand" Margin="0,0,0,15">
-          <TableView Intent="Settings" VerticalOptions="FillAndExpand" Margin="0" BackgroundColor="{x:Static statics:Palette._Transparent}">
+          <TableView x:Name="tableView" Intent="Settings" VerticalOptions="FillAndExpand" Margin="0" BackgroundColor="{x:Static statics:Palette._Transparent}">
             <TableRoot>
                 <TableSection Title="{localization:Translate Settings}">
                   <ViewCell>
                     <StackLayout Orientation="Horizontal" VerticalOptions="CenterAndExpand">
                       <Label Text="{Binding SettingLanguageText}" HorizontalOptions="StartAndExpand" Style="{DynamicResource labelStyleLink}" />
                       <controls:LanguageOption x:Name="languageOption" HorizontalOptions="EndAndExpand"></controls:LanguageOption>
+                      <StackLayout.GestureRecognizers>
+                          <TapGestureRecognizer Tapped="LanguageSelect_OnTapped"></TapGestureRecognizer>
+                      </StackLayout.GestureRecognizers>
                     </StackLayout>
                   </ViewCell>
                   <ViewCell>
@@ -28,6 +31,9 @@
                         </Label.GestureRecognizers>
                       </Label>
                       <Picker x:Name="PickerWeightVolume" IsVisible="False"></Picker>
+                      <StackLayout.GestureRecognizers>
+                          <TapGestureRecognizer Tapped="WeightVolumeSelect_OnTapped"></TapGestureRecognizer>
+                      </StackLayout.GestureRecognizers>
                     </StackLayout>
                   </ViewCell>
                 </TableSection>
@@ -35,5 +41,5 @@
             </TableView>
           </StackLayout>
         <controls:FooterView/>
-  </StackLayout>
+    </StackLayout>
 </page:UserSettingPageXaml>

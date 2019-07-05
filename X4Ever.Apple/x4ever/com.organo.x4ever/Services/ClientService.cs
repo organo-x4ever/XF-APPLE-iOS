@@ -31,7 +31,7 @@ namespace com.organo.x4ever.Services
 
         public static string GetRequestUri(string controllerWithMethod)
         {
-            if (App.Configuration != null)
+            if (!string.IsNullOrEmpty(App.Configuration?.AppConfig?.BaseUrl))
                 return App.Configuration?.AppConfig.BaseUrl + "api/" + controllerWithMethod;
             else
                 return ApiUrl + "api/" + controllerWithMethod;
@@ -335,7 +335,7 @@ namespace com.organo.x4ever.Services
             if (!request.Headers.Contains(HttpConstants.PLATFORM))
             {
                 var platform = DeviceInfo.GetPlatform;
-                if (platform != null)
+                if (string.IsNullOrEmpty(platform))
                     request.Headers.Add(HttpConstants.PLATFORM, platform);
             }
             

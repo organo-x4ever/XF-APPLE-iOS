@@ -36,17 +36,25 @@ namespace com.organo.x4ever.Pages.UserSettings
             NavigationPage.SetHasNavigationBar(this, true);
             BindingContext = _model;
             _model.SetActivityResource();
-            await _model.LoadAppLanguages(OnLanguageRetrieve);
-            await _model.LoadWeightVolume(BindWeightVolume);
+            await Task.Run(async () =>
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(10));
+                await _model.LoadAppLanguages(OnLanguageRetrieve);
+                await _model.LoadWeightVolume(BindWeightVolume);
+                Device.BeginInvokeOnMainThread(() => { tableView.Focus(); });
+            });
         }
 
         private void OnLanguageRetrieve()
         {
-            languageOption.DataSource = _model.ApplicationLanguages;
-            languageOption.ShowSelection = _model.ApplicationLanguages.Count > 1;
-            languageOption.OnItemSelectedAction = OnLanguageSelected;
-            languageOption.TextStyle = (Style) App.CurrentApp.Resources["labelStyleTableViewItem"];
-            languageOption.FlagStyle = (Style) App.CurrentApp.Resources["imageEntryIcon"];
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                languageOption.DataSource = _model.ApplicationLanguages;
+                languageOption.ShowSelection = _model.ApplicationLanguages.Count > 1;
+                languageOption.OnItemSelectedAction = OnLanguageSelected;
+                languageOption.TextStyle = (Style) App.CurrentApp.Resources["labelStyleTableViewItem"];
+                languageOption.FlagStyle = (Style) App.CurrentApp.Resources["imageEntryIcon"];
+            });
         }
 
         private void OnLanguageSelected()
@@ -56,11 +64,21 @@ namespace com.organo.x4ever.Pages.UserSettings
 
         private void BindWeightVolume()
         {
-            PickerWeightVolume.Title = TextResources.SelectWeightVolumeType;
-            PickerWeightVolume.ItemsSource = _model.WeightVolumeData;
-            PickerWeightVolume.ItemDisplayBinding = new Binding("DisplayVolume");
-            _model.WeightVolumeClick_Action = OnWeightVolumeClicked;
-            PickerWeightVolume.SelectedIndexChanged += PickerWeightVolume_SelectedIndexChanged;
+            try
+            {
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    PickerWeightVolume.Title = TextResources.SelectWeightVolumeType;
+                    PickerWeightVolume.ItemsSource = _model.WeightVolumeData;
+                    PickerWeightVolume.ItemDisplayBinding = new Binding("DisplayVolume");
+                    _model.WeightVolumeClick_Action = OnWeightVolumeClicked;
+                    PickerWeightVolume.SelectedIndexChanged += PickerWeightVolume_SelectedIndexChanged;
+                });
+            }
+            catch (Exception ex)
+            {
+                _ = ex;
+            }
         }
 
         private void OnWeightVolumeClicked()
@@ -73,7 +91,17 @@ namespace com.organo.x4ever.Pages.UserSettings
 
         private void PickerWeightVolume_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _model.OnWeightVolumeChange((WeightVolume)PickerWeightVolume.SelectedItem);
+            _model.OnWeightVolumeChange((WeightVolume) PickerWeightVolume.SelectedItem);
+        }
+
+        private void LanguageSelect_OnTapped(object sender, EventArgs e)
+        {
+            languageOption.LanguageChange_Click();
+        }
+
+        private void WeightVolumeSelect_OnTapped(object sender, EventArgs e)
+        {
+            _model.WeightVolumeClick_Action();
         }
     }
 

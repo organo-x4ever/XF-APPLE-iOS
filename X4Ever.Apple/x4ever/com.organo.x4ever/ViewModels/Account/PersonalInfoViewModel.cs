@@ -28,6 +28,7 @@ namespace com.organo.x4ever.ViewModels.Account
                 _converter.DisplayWeightVolume(App.Configuration.AppConfig.MAXIMUM_WEIGHT_LOSE_KG,
                     App.Configuration.AppConfig.MAXIMUM_WEIGHT_LOSE_LB);
             WeightLossGoalValue = WeightLossGoalMinimumValue;
+            NextButtonText = TextResources.Next;
         }
         
         public void SetSliders()
@@ -116,7 +117,24 @@ namespace com.organo.x4ever.ViewModels.Account
             get { return ageMinimumValue; }
             set { SetProperty(ref ageMinimumValue, value, AgeMinimumValuePropertyName); }
         }
+
+        private string reviseRequestText;
+        public const string ReviseRequestTextPropertyName = "ReviseRequestText";
+
+        public string ReviseRequestText
+        {
+            get => reviseRequestText;
+            set => SetProperty(ref reviseRequestText, value, ReviseRequestTextPropertyName);
+        }
         
+        private string nextButtonText;
+        public const string NextButtonTextPropertyName = "NextButtonText";
+
+        public string NextButtonText
+        {
+            get => nextButtonText;
+            set => SetProperty(ref nextButtonText, value, NextButtonTextPropertyName);
+        }
 
         private Slider _sliderCurrentWeightModel;
         public const string SliderCurrentWeightModelPropertyName = "SliderCurrentWeightModel";

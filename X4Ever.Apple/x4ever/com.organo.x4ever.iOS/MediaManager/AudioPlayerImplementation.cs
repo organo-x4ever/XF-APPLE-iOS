@@ -89,8 +89,6 @@ namespace com.organo.x4ever
             set => _image = value;
         }
 
-        private bool _isPlaying;
-
         public bool IsPlaying
         {
             get => !StreamingItemPaused; //Player != null ? (Player.CurrentTime.Seconds > 0) : false;

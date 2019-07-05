@@ -14,16 +14,16 @@ namespace com.organo.x4ever.Pages.MealPlan
             try
             {
                 InitializeComponent();
-                this._model = new MealPlanViewModel(App.CurrentApp.MainPage.Navigation)
+                _model = new MealPlanViewModel(App.CurrentApp.MainPage.Navigation)
                 {
                     Root = root,
                     BindDataSourceAction = () =>
                     {
-                        AccordionMain.DataSource = this._model.AccordionSources;
+                        AccordionMain.DataSource = _model.AccordionSources;
                         AccordionMain.DataBind();
                     },
                 };
-                this.Init();
+                Init();
             }
             catch (Exception exception)
             {
@@ -36,14 +36,14 @@ namespace com.organo.x4ever.Pages.MealPlan
             await App.Configuration.InitialAsync(this);
             NavigationPage.SetHasNavigationBar(this, false);
 
-            BindingContext = this._model;
+            BindingContext = _model;
             AccordionMain.FirstExpaned = true;
-            this.Page_Load();
+            Page_Load();
         }
 
         protected async void Page_Load()
         {
-            await this._model.UpdateMealOptionSelected(MealOptionSelected.FullMeals);
+            await _model.UpdateMealOptionSelected(MealOptionSelected.FullMeals);
         }
     }
 
