@@ -207,8 +207,8 @@ namespace com.organo.x4ever.Pages
                     return;
 
                 lastMenuType = id;
-                //id == MenuType.WorkoutVideos || //id == MenuType.MyMusic ||
                 if (id == MenuType.MyMusic || 
+                    id == MenuType.WorkoutVideos ||
                     id == MenuType.Settings || 
                     id == MenuType.OgxSystem ||
                     id == MenuType.More)
