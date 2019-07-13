@@ -95,6 +95,7 @@
     <Compile Include="Effects\Control\IAnimation.cs" />
     <Compile Include="Effects\Control\IControlEntity.cs" />
     <Compile Include="Extensions\Capitalize.cs" />
+    <Compile Include="Extensions\DataCleaning.cs" />
     <Compile Include="Extensions\ExtensionCheck.cs" />
     <Compile Include="Extensions\ImageDynamicResourceExtension.cs" />
     <Compile Include="Extensions\ImageResourceExtension.cs" />

@@ -1,4 +1,5 @@
 ﻿
+using com.organo.x4ever.Helpers;
 using com.organo.x4ever.Localization;
 using com.organo.x4ever.Models.Notifications;
 using com.organo.x4ever.Services;
@@ -58,13 +59,15 @@ namespace com.organo.x4ever.Services
                 .RetrieveStringFromBytes(Keys.DEVICE_TOKEN_IDENTITY);
             if (!string.IsNullOrEmpty(deviceToken))
             {
-                return await Insert(new UserPushTokenModel()
+                return await Insert(new UserPushTokenModel() 
                 {
                     DeviceToken = deviceToken,
                     IssuedOn = DateTime.Now,
                     DeviceIdentity = string.Format(TextResources.AppVersion,
                         App.Configuration.AppConfig.ApplicationVersion),
                     DeviceIdiom = Device.Idiom.ToString(),
+                    DeviceApplication = App.Configuration?.GetApplication(),
+                    DevicePlatform = DependencyService.Get<IDeviceInfo>().GetPlatform
                 });
             }
 

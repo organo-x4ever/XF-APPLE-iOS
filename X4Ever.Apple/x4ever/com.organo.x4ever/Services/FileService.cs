@@ -9,6 +9,7 @@ using com.organo.x4ever.Localization;
 using com.organo.x4ever.Models;
 using Newtonsoft.Json;
 using Xamarin.Forms;
+using com.organo.x4ever.Extensions;
 
 [assembly: Dependency(typeof(FileService))]
 
@@ -58,7 +59,7 @@ namespace com.organo.x4ever.Services
         public async Task<HttpResponseMessage> UploadFileResponseAsync(MediaFile _mediaFile)
         {
             var content = new MultipartFormDataContent();
-            content.Add(new StreamContent(_mediaFile.GetStream()), "\"file\"", $"\"{_mediaFile.Path}\"");
+            content.Add(new StreamContent(_mediaFile.GetStream()), "\"file\"", $"\"{_mediaFile.Path.Clean()}\"");
             var uploadAddress = App.Configuration.AppConfig.BaseUrl + "api/" + ControllerName + "/uploadasync";
             return await ClientService.PostAsync(uploadAddress, content);
         }

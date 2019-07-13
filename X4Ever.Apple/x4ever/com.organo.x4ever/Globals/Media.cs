@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using com.organo.x4ever.Handler;
 using com.organo.x4ever.Helpers;
 using Xamarin.Forms;
+using com.organo.x4ever.Extensions;
 
 [assembly: Dependency(typeof(com.organo.x4ever.Globals.Media))]
 
@@ -117,6 +118,7 @@ namespace com.organo.x4ever.Globals
                 {
                     var splits = response.Split('#');
                     FileName = splits[1];
+                    FileName = FileName.Clean();
                     var lastIndex = FileName.LastIndexOf('"');
                     if (lastIndex != -1)
                         FileName = FileName.Remove(lastIndex, 1);
@@ -148,6 +150,7 @@ namespace com.organo.x4ever.Globals
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     FileName = await response.Content.ReadAsStringAsync();
+                    FileName = FileName.Clean();
                     var lastIndex = FileName.LastIndexOf('"');
                     if (lastIndex != -1)
                         FileName = FileName.Remove(lastIndex, 1);

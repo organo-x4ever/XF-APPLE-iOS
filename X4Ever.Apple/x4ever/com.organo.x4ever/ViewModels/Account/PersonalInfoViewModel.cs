@@ -4,13 +4,16 @@ using System;
 using com.organo.x4ever.Converters;
 using com.organo.x4ever.Extensions;
 using Xamarin.Forms;
+using com.organo.x4ever.Services;
+using System.Text.RegularExpressions;
 
 namespace com.organo.x4ever.ViewModels.Account
 {
     public class PersonalInfoViewModel : BaseViewModel
     {
         private readonly PoundToKiligramConverter _converter = new PoundToKiligramConverter();
-
+        // Ask to revise if user wants to lose more than
+        private const int _weightLosePercent = 50;
         public PersonalInfoViewModel(INavigation navigation = null) : base(navigation)
         {
             AgeMinimumValue = 0;
@@ -72,6 +75,13 @@ namespace com.organo.x4ever.ViewModels.Account
                     App.Configuration.AppConfig.MINIMUM_WEIGHT_LOSE_LB), delay: 2);
         }
 
+        public async void GetWeightLoseWarning()
+        {
+            WeightLoseWarningPercent = _weightLosePercent;
+            var _weightLoseWarning = await DependencyService.Get<IConstantServices>().WeightLoseWarningPercentile();
+            if (double.TryParse(Regex.Replace(_weightLoseWarning, "\"", ""), out double percent))
+                WeightLoseWarningPercent = percent;
+        }
 
         public string YourCurrentWeightText => string.Format(TextResources.YourCurrentWeightFormat1,
             App.Configuration.AppConfig.DefaultWeightVolume);
@@ -126,7 +136,25 @@ namespace com.organo.x4ever.ViewModels.Account
             get => reviseRequestText;
             set => SetProperty(ref reviseRequestText, value, ReviseRequestTextPropertyName);
         }
+            
+        private string reviseHeaderText;
+        public const string ReviseHeaderTextPropertyName = "ReviseHeaderText";
+
+        public string ReviseHeaderText
+        {
+            get => reviseHeaderText;
+            set => SetProperty(ref reviseHeaderText, value, ReviseHeaderTextPropertyName);
+        }
         
+        private double weightLoseWarningPercent = 0;
+        public const string WeightLoseWarningPercentPropertyName = "WeightLoseWarningPercent";
+
+        public double WeightLoseWarningPercent
+        {
+            get { return weightLoseWarningPercent; }
+            set { SetProperty(ref weightLoseWarningPercent, value, WeightLoseWarningPercentPropertyName); }
+        }
+
         private string nextButtonText;
         public const string NextButtonTextPropertyName = "NextButtonText";
 

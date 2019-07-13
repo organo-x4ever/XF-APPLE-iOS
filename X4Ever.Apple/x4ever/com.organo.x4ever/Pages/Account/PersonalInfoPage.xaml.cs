@@ -12,31 +12,37 @@ using System.Threading.Tasks;
 using com.organo.x4ever.Converters;
 using com.organo.x4ever.Globals;
 using Xamarin.Forms;
+using com.organo.x4ever.Handler;
 
 namespace com.organo.x4ever.Pages.Account
 {
     public partial class PersonalInfoPage : PersonalInfoPageXaml
     {
         private PersonalInfoViewModel _model;
-        private UserFirstUpdate _user;
+        private readonly UserFirstUpdate _user;
         private readonly IMetaPivotService _metaPivotService;
         private readonly ITrackerPivotService _trackerPivotService;
         private readonly IHelper _helper;
         private readonly PoundToKiligramConverter _converter = new PoundToKiligramConverter();
         private const string revisionNumber = "10000";
-        // Ask to revise if user wants to lose more than
-        private const int AskToRevisePercent = 40;
         private bool IsRevised { get; set; }
 
         public PersonalInfoPage(UserFirstUpdate user)
         {
-            InitializeComponent();
-            _user = user;
-            _metaPivotService = DependencyService.Get<IMetaPivotService>();
-            _trackerPivotService = DependencyService.Get<ITrackerPivotService>();
-            _helper = DependencyService.Get<IHelper>();
-            IsRevised = false;
-            Init();
+            try
+            {
+                InitializeComponent();
+                _user = user;
+                _metaPivotService = DependencyService.Get<IMetaPivotService>();
+                _trackerPivotService = DependencyService.Get<ITrackerPivotService>();
+                _helper = DependencyService.Get<IHelper>();
+                IsRevised = false;
+                Init();
+            }
+            catch (Exception ex)
+            {
+                new ExceptionHandler(TAG, ex);
+            }
         }
 
         public sealed override async void Init(object obj = null)
@@ -70,6 +76,7 @@ namespace com.organo.x4ever.Pages.Account
             }
 
             buttonNext.Clicked += async (sender, e) => { await NextStepAsync(); };
+            _model.GetWeightLoseWarning();
         }
 
         private async Task NextStepAsync()
@@ -123,6 +130,7 @@ namespace com.organo.x4ever.Pages.Account
 
         private bool Validate()
         {
+           _model.NextButtonText = TextResources.Next;
             ValidationErrors validationErrors = new ValidationErrors();
             if (_model.AgeValue == 0)
                 validationErrors.Add(string.Format(TextResources.Required_IsMandatory, TextResources.YourAge));
@@ -147,12 +155,43 @@ namespace com.organo.x4ever.Pages.Account
                 validationErrors.Add(string.Format(TextResources.Validation_MustBeMoreThan,
                     TextResources.WeightLossGoal,
                     _converter.DisplayWeightVolume(App.Configuration.AppConfig.MINIMUM_WEIGHT_LOSE_KG)));
-            _model.ReviseRequestText = string.Empty;
-            if (!IsRevised && (_model.WeightLossGoalValue > _model.CurrentWeightValue / 100 * AskToRevisePercent))
+            else if(_model.WeightLossGoalValue>_model.CurrentWeightValue)
+                validationErrors.Add(string.Format(TextResources.Validation_MustBeLessThan, TextResources.WeightLossGoal,TextResources.YourCurrentWeight));
+
+            _model.ReviseHeaderText = _model.ReviseRequestText = string.Empty;
+            labelReviseRequest.FormattedText = new FormattedString();
+            if (!IsRevised && (_model.WeightLossGoalValue > ((_model.CurrentWeightValue / 100) * _model.WeightLoseWarningPercent)))
             {
-                _model.ReviseRequestText = string.Format(TextResources.ReviseWeightText, AskToRevisePercent);
+                _model.ReviseRequestText = string.Format(TextResources.ReviseWeightText, (int)((_model.WeightLossGoalValue * 100) / _model.CurrentWeightValue));
+                _model.ReviseHeaderText = TextResources.Warning;
                 validationErrors.Add(_model.ReviseRequestText);
                 _model.NextButtonText = TextResources.Yes + ", " + TextResources.Continue;
+
+                try {
+                    labelReviseRequest.FormattedText = new FormattedString() {
+                        Spans = {
+                            new Span() {
+                                Text=_model.ReviseHeaderText,
+                                ForegroundColor = Palette._Error,
+                                FontAttributes = FontAttributes.Bold,
+                            },
+                            new Span() {
+                                Text=": ",
+                                ForegroundColor = Palette._Error,
+                                FontAttributes = FontAttributes.Bold,
+                            },
+                            new Span() {
+                                Text=_model.ReviseRequestText,
+                                ForegroundColor = Palette._White,
+                                FontAttributes = FontAttributes.None,
+                            },
+                        }
+                    };
+                }
+                catch(Exception ex)
+                {
+                    new ExceptionHandler(TAG, ex);
+                }
             }
             IsRevised = true;
 

@@ -23,5 +23,7 @@ namespace com.organo.x4ever.Services
             $"&{HttpConstants.REQUEST_HEADER_LANGUAGE}={App.Configuration?.AppConfig.DefaultLanguage}" +
             $"&{HttpConstants.VERSION}={App.Configuration?.AppConfig.ApplicationVersion}" +
             $"&{HttpConstants.PLATFORM}={DeviceInfo.GetPlatform}")));
+
+        public async Task<string> WeightLoseWarningPercentile() => await ClientService.GetStringAsync(new Uri(ClientService.GetRequestUri("constants", $"weightlosewarningpercentile")));
     }
 }

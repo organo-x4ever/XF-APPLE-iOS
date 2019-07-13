@@ -3482,6 +3482,15 @@ namespace com.organo.x4ever.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NOTE.
+        /// </summary>
+        internal static string Note {
+            get {
+                return ResourceManager.GetString("Note", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tap on.
         /// </summary>
         internal static string NoteTapOn {
@@ -5004,6 +5013,15 @@ namespace com.organo.x4ever.Localization {
         internal static string VideoPlaylist {
             get {
                 return ResourceManager.GetString("VideoPlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WARNING.
+        /// </summary>
+        internal static string Warning {
+            get {
+                return ResourceManager.GetString("Warning", resourceCulture);
             }
         }
         

@@ -7,5 +7,6 @@ namespace com.organo.x4ever.Services
     {
         Task<string> Blogs();
         Task<string> MoreWebLinks();
+        Task<string> WeightLoseWarningPercentile();
     }
 }

@@ -44,7 +44,7 @@ namespace com.organo.x4ever.Pages
                 Title = TextResources.x4ever,
                 Subtitle = TextResources.x4ever,
                 Icon = TextResources.icon_menu,
-                Root = (RootPage) obj,
+                Root = (RootPage)obj,
                 MenuBindCallback = MenuBind
             };
             BindingContext = _model;
@@ -64,7 +64,7 @@ namespace com.organo.x4ever.Pages
                 {
                     if (ListViewMenu.SelectedItem != null)
                     {
-                        var menuItem = (HomeMenuItem) ListViewMenu.SelectedItem;
+                        var menuItem = (HomeMenuItem)ListViewMenu.SelectedItem;
                         if (!menuItem.IsSelected)
                         {
                             await _model.Root.NavigateAsync(menuItem.MenuType);
@@ -89,69 +89,45 @@ namespace com.organo.x4ever.Pages
         private async void ChangeProfilePhoto(object sender, EventArgs args)
         {
             var result = await DisplayActionSheet(TextResources.ChooseOption, TextResources.Cancel, null,
-                new string[] {TextResources.PickFromGallery, TextResources.TakeFromCamera});
+                new string[] { TextResources.PickFromGallery, TextResources.TakeFromCamera });
 
-            if (result != null)
-            {
-                if (result == "Cancel")
-                    return;
+            if (!string.IsNullOrEmpty(result) && result?.ToLower() != "cancel") {
+                _media.Refresh();
                 if (result == TextResources.PickFromGallery)
-                {
-                    _media.Refresh();
-                    var mediaFile = await _media.PickPhotoAsync();
-                    if (mediaFile == null)
-                    {
-                        _model.SetActivityResource(showError: true, errorMessage: _media.Message);
-                        return;
-                    }
-
-                    await Task.Run(() => { _model.SetActivityResource(false, true); });
-                    var response = await _media.UploadPhotoAsync(mediaFile);
-                    if (!response)
-                    {
-                        _model.SetActivityResource(true, false, showError: true, errorMessage: _media.Message);
-                        return;
-                    }
-                }
+                    UploadPhoto(await _media.PickPhotoAsync());
                 else if (result == TextResources.TakeFromCamera)
-                {
-                    _media.Refresh();
-                    var mediaFile = await _media.TakePhotoAsync();
-                    if (mediaFile == null)
-                    {
-                        _model.SetActivityResource(showError: true, errorMessage: _media.Message);
-                        return;
-                    }
-
-                    await Task.Run(() => { _model.SetActivityResource(false, true); });
-                    var response = await _media.UploadPhotoAsync(mediaFile);
-                    if (!response)
-                    {
-                        _model.SetActivityResource(true, false, showError: true, errorMessage: _media.Message);
-                        return;
-                    }
-                }
-                _model.SetActivityResource();
-
-                if (!string.IsNullOrEmpty(_media.FileName))
-                {
-                    var profileImage = _metaPivotService.AddMeta(_media.FileName,
-                        MetaConstants.PROFILE_PHOTO.ToCapital(), MetaConstants.PROFILE_PHOTO,
-                        MetaConstants.PROFILE_PHOTO);
-                    var response = await _metaPivotService.SaveMetaAsync(profileImage);
-                    if (response != null && response.Contains(HttpConstants.SUCCESS))
-                    {
-                        _model.User.ProfileImage = _media.FileName;
-                        App.CurrentUser.UserInfo = _model.User;
-                        _model.ProfileImagePath = _model.User.ProfileImage;
-                        _model.SetActivityResource(showMessage: true,
-                            message: TextResources.ChangeProfilePhoto + " " + TextResources.Change + " " +
-                                     TextResources.Success);
-                    }
-                }
-                else
-                    _model.SetActivityResource(showError: true, errorMessage: _media.Message);
+                    UploadPhoto(await _media.TakePhotoAsync());
             }
+        }
+
+        private async void UploadPhoto(Plugin.Media.Abstractions.MediaFile mediaFile)
+        {
+            if (mediaFile != null)
+            {
+                await Task.Run(() => { _model.SetActivityResource(false, true); });
+                if (await _media.UploadPhotoAsync(mediaFile))
+                {
+                    if (!string.IsNullOrEmpty(_media.FileName))
+                    {
+                        var profileImage = _metaPivotService.AddMeta(_media.FileName,
+                            MetaConstants.PROFILE_PHOTO.ToCapital(), 
+                            MetaConstants.PROFILE_PHOTO,
+                            MetaConstants.PROFILE_PHOTO);
+                        var response = await _metaPivotService.SaveMetaAsync(profileImage);
+                        if (response != null && response.Contains(HttpConstants.SUCCESS))
+                        {
+                            _model.User.ProfileImage = _media.FileName;
+                            App.CurrentUser.UserInfo = _model.User;
+                            _model.ProfileImagePath = _model.User.ProfileImage;
+                            _model.SetActivityResource(showMessage: true,
+                                message: TextResources.ChangeProfilePhoto + " " + TextResources.Change + " " +
+                                         TextResources.Success);
+                            return;
+                        }
+                    }
+                }
+            }
+            _model.SetActivityResource(showError: true, errorMessage: _media.Message);
         }
     }
 
