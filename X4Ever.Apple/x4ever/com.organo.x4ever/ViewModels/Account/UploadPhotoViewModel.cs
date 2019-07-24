@@ -2,6 +2,7 @@
 using com.organo.x4ever.Helpers;
 using com.organo.x4ever.Localization;
 using com.organo.x4ever.Models;
+using com.organo.x4ever.Services;
 using com.organo.x4ever.Statics;
 using com.organo.x4ever.ViewModels.Base;
 using Xamarin.Forms;
@@ -11,12 +12,22 @@ namespace com.organo.x4ever.ViewModels.Account
     public class UploadPhotoViewModel : BaseViewModel
     {
         private readonly IHelper helper;
+        private readonly IConstantServices _constantServices;
         public UploadPhotoViewModel(INavigation navigation = null) : base(navigation)
         {
+            SkipPhotoOption = false;
             helper = DependencyService.Get<IHelper>();
-            this.SetPageImageSize();
-            this.ImageFront = this.ImageDefault;
-            this.ImageSide = this.ImageDefault;
+            SetPageImageSize();
+            ImageFront = this.ImageDefault;
+            ImageSide = this.ImageDefault;
+            _constantServices = DependencyService.Get<IConstantServices>();
+            SetSkipPhotoOption();
+        }
+
+        public async void SetSkipPhotoOption()
+        {
+            var _skip=await _constantServices.TrackerSkipPhotos();
+            SkipPhotoOption = _skip;
         }
 
         public string ImageDefault => TextResources.icon_camera;
@@ -99,6 +110,14 @@ namespace com.organo.x4ever.ViewModels.Account
         {
             get { return cameraImageWidth; }
             set { SetProperty(ref cameraImageWidth, value, CameraImageWidthPropertyName); }
+        }
+
+        private bool skipPhotoOption;
+        public const string SkipPhotoOptionPropertyName = "SkipPhotoOption";
+        public bool SkipPhotoOption
+        {
+            get => skipPhotoOption;
+            set => SetProperty(ref skipPhotoOption, value, SkipPhotoOptionPropertyName);
         }
     }
 }

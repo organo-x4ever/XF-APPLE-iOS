@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using com.organo.x4ever.Converters;
 using com.organo.x4ever.Localization;
@@ -181,6 +182,11 @@ namespace com.organo.x4ever.Services
                 return jsonTask.Result;
             }
             else return TextResources.MessageSomethingWentWrong;
+        }
+
+        public async Task PostSkipOptionAsync(string email, bool skip)
+        {
+            await ClientService.PostDataAsync(null, ControllerName, "posttrackerskipphotos?options=" + Convert.ToBase64String(Encoding.UTF8.GetBytes(email + ":" + (skip ? "1" : "0"))));
         }
     }
 }

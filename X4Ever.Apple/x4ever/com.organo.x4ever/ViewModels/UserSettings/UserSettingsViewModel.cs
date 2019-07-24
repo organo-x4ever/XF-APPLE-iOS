@@ -24,13 +24,14 @@ namespace com.organo.x4ever.ViewModels.UserSettings
             ApplicationLanguages = new List<ApplicationLanguage>();
             SettingLanguageText = TextResources.Language;
             SettingWeightVolumeText = TextResources.WeightVolumeType;
+            WeightVolumeSelected=string.Empty;
 
             WeightVolumeClick_Action = null;
         }
 
         public async Task LoadAppLanguages(Action action)
         {
-           var applicationLanguages = await DependencyService.Get<IApplicationLanguageService>().GetWithCountryAsync();
+            var applicationLanguages = await DependencyService.Get<IApplicationLanguageService>().GetWithCountryAsync();
 
             ApplicationLanguages = applicationLanguages.Select(l =>
             {
@@ -95,7 +96,13 @@ namespace com.organo.x4ever.ViewModels.UserSettings
             WeightVolumeSelected = WeightVolumeDataSelected.DisplayVolume;
         }
 
-        public List<ApplicationLanguage> ApplicationLanguages { get; set; }
+        private List<ApplicationLanguage> applicationLanguages;
+        public const string ApplicationLanguagesPropertyName = "ApplicationLanguages";
+        public List<ApplicationLanguage> ApplicationLanguages
+        {
+            get => applicationLanguages;
+            set => SetProperty(ref applicationLanguages, value, ApplicationLanguagesPropertyName);
+        }
 
         private string _settingLanguageText;
         public const string SettingLanguageTextPropertyName = "SettingLanguageText";

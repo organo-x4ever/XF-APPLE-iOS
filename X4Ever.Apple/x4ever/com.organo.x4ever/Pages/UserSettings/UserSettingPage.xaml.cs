@@ -15,6 +15,7 @@ namespace com.organo.x4ever.Pages.UserSettings
     public partial class UserSettingPage : UserSettingPageXaml
     {
         private readonly UserSettingsViewModel _model;
+        private bool IsEventAllowed = false;
 
         public UserSettingPage()
         {
@@ -34,6 +35,7 @@ namespace com.organo.x4ever.Pages.UserSettings
         {
             await App.Configuration.InitialAsync(this);
             NavigationPage.SetHasNavigationBar(this, true);
+            IsEventAllowed = false;
             BindingContext = _model;
             _model.SetActivityResource();
             await Task.Run(async () =>
@@ -41,7 +43,13 @@ namespace com.organo.x4ever.Pages.UserSettings
                 await Task.Delay(TimeSpan.FromMilliseconds(10));
                 await _model.LoadAppLanguages(OnLanguageRetrieve);
                 await _model.LoadWeightVolume(BindWeightVolume);
-                Device.BeginInvokeOnMainThread(() => { tableView.Focus(); });
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    tableView.Focus();
+                    LanguageSelect_OnTapped(tableSection[0] as ViewCell, new EventArgs());
+                    WeightVolumeSelect_OnTapped(tableSection[0] as ViewCell, new EventArgs());
+                    IsEventAllowed = true;
+                });
             });
         }
 
@@ -52,8 +60,8 @@ namespace com.organo.x4ever.Pages.UserSettings
                 languageOption.DataSource = _model.ApplicationLanguages;
                 languageOption.ShowSelection = _model.ApplicationLanguages.Count > 1;
                 languageOption.OnItemSelectedAction = OnLanguageSelected;
-                languageOption.TextStyle = (Style) App.CurrentApp.Resources["labelStyleTableViewItem"];
-                languageOption.FlagStyle = (Style) App.CurrentApp.Resources["imageEntryIcon"];
+                languageOption.TextStyle = (Style)App.CurrentApp.Resources["labelStyleTableViewItem"];
+                languageOption.FlagStyle = (Style)App.CurrentApp.Resources["imageEntryIcon"];
             });
         }
 
@@ -91,17 +99,19 @@ namespace com.organo.x4ever.Pages.UserSettings
 
         private void PickerWeightVolume_SelectedIndexChanged(object sender, EventArgs e)
         {
-            _model.OnWeightVolumeChange((WeightVolume) PickerWeightVolume.SelectedItem);
+            _model.OnWeightVolumeChange((WeightVolume)PickerWeightVolume.SelectedItem);
         }
 
         private void LanguageSelect_OnTapped(object sender, EventArgs e)
         {
-            languageOption.LanguageChange_Click();
+            if (IsEventAllowed)
+                languageOption.LanguageChange_Click();
         }
 
         private void WeightVolumeSelect_OnTapped(object sender, EventArgs e)
         {
-            _model.WeightVolumeClick_Action();
+            if (IsEventAllowed)
+                _model.WeightVolumeClick_Action();
         }
     }
 

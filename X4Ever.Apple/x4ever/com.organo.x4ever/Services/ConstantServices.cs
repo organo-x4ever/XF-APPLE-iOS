@@ -24,6 +24,14 @@ namespace com.organo.x4ever.Services
             $"&{HttpConstants.VERSION}={App.Configuration?.AppConfig.ApplicationVersion}" +
             $"&{HttpConstants.PLATFORM}={DeviceInfo.GetPlatform}")));
 
-        public async Task<string> WeightLoseWarningPercentile() => await ClientService.GetStringAsync(new Uri(ClientService.GetRequestUri("constants", $"weightlosewarningpercentile")));
+        public async Task<bool> TrackerSkipPhotos()
+        {
+            var response = await ClientService.GetStringAsync(new Uri(ClientService.GetRequestUri("constants", "trackerskipphotoonsteps")));
+            if (response != null)
+                return response.ToLower().Contains("yes");
+            return false;
+        }
+
+        public async Task<string> WeightLoseWarningPercentile() => await ClientService.GetStringAsync(new Uri(ClientService.GetRequestUri("constants", "weightlosewarningpercentile")));
     }
 }

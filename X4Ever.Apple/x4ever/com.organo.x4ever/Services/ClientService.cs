@@ -335,7 +335,7 @@ namespace com.organo.x4ever.Services
             if (!request.Headers.Contains(HttpConstants.PLATFORM))
             {
                 var platform = DeviceInfo.GetPlatform;
-                if (string.IsNullOrEmpty(platform))
+                if (!string.IsNullOrEmpty(platform))
                     request.Headers.Add(HttpConstants.PLATFORM, platform);
             }
             

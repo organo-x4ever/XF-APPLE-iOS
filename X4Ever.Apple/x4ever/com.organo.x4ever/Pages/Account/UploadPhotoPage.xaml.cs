@@ -81,6 +81,16 @@ namespace com.organo.x4ever.Pages.Account
             imageSide.GestureRecognizers.Add(tapImageSide);
 
             buttonSubmit.Clicked += async (sender, e) => { await SubmitAsync(); };
+            buttonSkip.Clicked += (sender, e) =>
+            {
+                UpdateSkipOption();
+                App.GoToAccountPage(true);
+            };
+        }
+
+        private async void UpdateSkipOption()
+        {
+            await _trackerPivotService.PostSkipOptionAsync(App.CurrentUser.UserInfo.UserEmail, true);
         }
 
         private async Task UploadImageAsync(ImageSide side)
