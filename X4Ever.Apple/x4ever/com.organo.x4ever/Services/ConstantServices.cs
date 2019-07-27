@@ -26,10 +26,18 @@ namespace com.organo.x4ever.Services
 
         public async Task<bool> TrackerSkipPhotos()
         {
-            var response = await ClientService.GetStringAsync(new Uri(ClientService.GetRequestUri("constants", "trackerskipphotoonsteps")));
+			var response = await ClientService.SendAsync(HttpMethod.Get, "constants", "trackerskipphotoonsteps");
             if (response != null)
-                return response.ToLower().Contains("yes");
+                {
+                var json = response.Content.ReadAsStringAsync();
+                return json.Result.ToLower().Contains("yes");
+            }
             return false;
+			
+            //var response = await ClientService.GetStringAsync(new Uri(ClientService.GetRequestUri("constants", "trackerskipphotoonsteps")));
+            //if (response != null)
+            //    return response.ToLower().Contains("yes");
+            //return false;
         }
 
         public async Task<string> WeightLoseWarningPercentile() => await ClientService.GetStringAsync(new Uri(ClientService.GetRequestUri("constants", "weightlosewarningpercentile")));
